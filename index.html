@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#A67C5B">
+<title>🦘 澳洲之旅 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5EFE7;--surface:#FDFAF6;--s2:#EDE3D8;
+  --pri:#A67C5B;--pdk:#7A5540;--acc:#C4956A;
+  --txt:#3D2B1F;--t2:#7A6055;--t3:#B09880;
+  --bdr:#DDD0C0;--ok:#7BAE7F;--warn:#E8A045;--danger:#D4756B;
+  --nav:68px;--r:16px;--rs:10px;
+  --sh:0 2px 12px rgba(100,60,30,.10);--shl:0 8px 32px rgba(100,60,30,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--txt);height:100dvh;overflow:hidden;font-size:15px;line-height:1.5}
+#app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;position:relative}
+/* Header */
+#hdr{height:56px;background:var(--surface);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;z-index:10}
+#hdr h1{font-family:'Playfair Display',serif;font-size:17px;color:var(--pdk);flex:1}
+#hdr .sub{font-size:11px;color:var(--t3)}
+/* Main */
+#main{flex:1;overflow:hidden;position:relative}
+.tab{display:none;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav)+16px)}
+.tab.on{display:block}
+/* Nav */
+#nav{height:var(--nav);background:var(--surface);border-top:1px solid var(--bdr);display:flex;align-items:stretch;flex-shrink:0;z-index:20}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--t3);border:none;background:none;padding:8px 0;transition:color .2s}
+.ni.on{color:var(--pri)}
+.ni svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+.ni span{font-size:10px;font-weight:500}
+/* Cards */
+.card{background:var(--surface);border-radius:var(--r);padding:16px;margin:12px 16px 0;box-shadow:var(--sh)}
+.ct{font-family:'Playfair Display',serif;font-size:15px;color:var(--pdk);margin-bottom:10px;font-weight:600}
+.sl{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin:18px 16px 8px}
+/* Date strip */
+#strip{overflow-x:auto;padding:10px 16px;display:flex;gap:8px;scroll-snap-type:x mandatory;scrollbar-width:none;background:var(--surface);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:5;flex-shrink:0}
+#strip::-webkit-scrollbar{display:none}
+.dc{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 11px;border-radius:12px;cursor:pointer;scroll-snap-align:start;transition:all .2s;border:1.5px solid transparent;min-width:50px}
+.dc:hover{background:var(--s2)}
+.dc.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.dc .dn{font-size:17px;font-weight:700;line-height:1}
+.dc .dd{font-size:9px;opacity:.8}
+.dc .dm{font-size:9px;opacity:.7}
+/* Day hero */
+.hero{background:linear-gradient(135deg,var(--pdk) 0%,var(--acc) 100%);color:#fff;padding:16px;margin:12px 16px 0;border-radius:var(--r);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-24px;right:-24px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hdate{font-size:11px;opacity:.8;margin-bottom:3px}
+.htheme{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;line-height:1.3;margin-bottom:8px}
+.hmeta{display:flex;gap:8px;flex-wrap:wrap}
+.hbadge{font-size:11px;background:rgba(255,255,255,.2);padding:3px 8px;border-radius:20px}
+/* Weather */
+.wcard{background:var(--s2);border-radius:var(--rs);padding:10px 14px;margin:10px 16px 0;display:flex;align-items:center;gap:12px}
+.wtemp{font-size:20px;font-weight:700;color:var(--pdk);white-space:nowrap}
+.wcloth{font-size:11px;color:var(--t2);line-height:1.5}
+/* Timeline */
+.tl{padding:0 16px;margin-top:4px}
+.ti{display:flex;gap:10px;position:relative;margin-bottom:2px}
+.ttime{width:44px;flex-shrink:0;font-size:10px;font-weight:600;color:var(--t3);padding-top:15px;text-align:right;line-height:1.2}
+.twrap{width:18px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
+.tdot{width:10px;height:10px;border-radius:50%;background:var(--pri);margin-top:16px;flex-shrink:0;z-index:1}
+.tvline{flex:1;width:1.5px;background:var(--bdr);min-height:14px}
+.tc{flex:1;background:var(--surface);border-radius:var(--rs);padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 6px rgba(100,60,30,.07);cursor:pointer;transition:transform .15s;position:relative;border:1.5px solid transparent}
+.tc:hover{border-color:var(--bdr)}
+.tc:active{transform:scale(.98)}
+.tctitle{font-size:13px;font-weight:500;color:var(--txt);line-height:1.35}
+.tcmeta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.tcost{font-size:11px;color:var(--pri);font-weight:600}
+.tmap{font-size:11px;color:var(--acc);text-decoration:none}
+.tnotes{font-size:11px;color:var(--t3);margin-top:4px;line-height:1.4}
+.elay{position:absolute;top:8px;right:8px;font-size:13px;opacity:0;transition:opacity .2s}
+.tc:hover .elay{opacity:1}
+.addact{display:flex;align-items:center;gap:6px;color:var(--acc);font-size:12px;font-weight:600;cursor:pointer;padding:10px 16px;border:none;background:none;font-family:inherit}
+/* Cost */
+.csum{background:var(--s2);border-radius:var(--rs);padding:12px;margin:10px 16px 0}
+.crow{display:flex;justify-content:space-between;align-items:center}
+.ctrow{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--bdr);margin-top:8px;padding-top:8px}
+.ctlabel{font-size:13px;font-weight:600}
+.ctval{font-size:16px;font-weight:700;color:var(--pri)}
+/* Flight cards */
+.fc{background:var(--surface);border-radius:var(--r);padding:16px;margin:10px 16px 0;box-shadow:var(--sh)}
+.fseg{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:8px;letter-spacing:.06em}
+.froute{display:flex;align-items:center;gap:8px}
+.fport{text-align:center;min-width:64px}
+.fcode{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--pdk)}
+.fcity{font-size:10px;color:var(--t3);margin-top:1px}
+.ftime{font-size:14px;font-weight:600}
+.farrow{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.fnum{font-size:11px;font-weight:700;color:var(--pri)}
+.fdur{font-size:10px;color:var(--t3)}
+.ftag{font-size:11px;padding:3px 8px;border-radius:20px;background:var(--s2);color:var(--t2)}
+.fok{background:#EBF5EC;color:#4A8F50}
+.fnote{margin-top:10px;font-size:12px;color:var(--t2);background:var(--s2);padding:8px 10px;border-radius:8px;line-height:1.5}
+/* Ticket */
+.tkt{background:#FFF9F0;border:1px solid #E8D5A0;border-radius:var(--rs);padding:12px;margin:8px 16px 0}
+.tkts{font-size:11px;font-weight:700;color:var(--warn)}
+.tkti{font-size:13px;font-weight:600;margin:3px 0}
+.tktd{font-size:11px;color:var(--t3)}
+.tktl{font-size:12px;color:var(--pri);text-decoration:none;display:inline-block;margin-top:6px}
+/* Accom */
+.ac{background:var(--surface);border-radius:var(--r);padding:16px;margin:10px 16px 0;box-shadow:var(--sh)}
+.acc{font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;margin-bottom:4px}
+.acn{font-size:16px;font-weight:600;margin-bottom:4px}
+.aca{font-size:12px;color:var(--t2);line-height:1.5}
+.acbts{display:flex;gap:8px;margin-top:12px}
+.btnol{flex:1;padding:8px;border:1.5px solid var(--bdr);border-radius:var(--rs);background:none;color:var(--pri);font-size:12px;font-weight:500;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .2s;font-family:inherit}
+.btnol:hover{background:var(--s2);border-color:var(--pri)}
+/* Packing */
+.pi{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--s2)}
+.pck{width:22px;height:22px;border-radius:6px;border:2px solid var(--bdr);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pck.on{background:var(--pri);border-color:var(--pri)}
+.pck.on::after{content:'✓';color:#fff;font-size:13px;font-weight:700}
+.ptxt{flex:1;font-size:13px}
+.ptxt.done{text-decoration:line-through;color:var(--t3)}
+.pdel{color:var(--t3);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0}
+/* Expense */
+.etbanner{background:linear-gradient(135deg,var(--pdk) 0%,var(--pri) 100%);color:#fff;padding:20px 16px;margin:12px 16px 0;border-radius:var(--r);text-align:center}
+.etlbl{font-size:12px;opacity:.8}
+.etaud{font-family:'Playfair Display',serif;font-size:36px;font-weight:700}
+.ettwd{font-size:14px;opacity:.8}
+.ei{background:var(--surface);border-radius:var(--rs);padding:12px;margin:8px 16px 0;display:flex;gap:12px;align-items:flex-start;box-shadow:0 1px 6px rgba(100,60,30,.06)}
+.eico{width:36px;height:36px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.einf{flex:1}
+.emch{font-size:13px;font-weight:600}
+.ecat{font-size:11px;color:var(--t3)}
+.enot{font-size:11px;color:var(--t3);font-style:italic;margin-top:2px}
+.ert{text-align:right}
+.eamt{font-size:15px;font-weight:700;color:var(--pri)}
+.edel{font-size:11px;color:var(--danger);cursor:pointer;margin-top:4px}
+.apib{background:#FFF9F0;border:1px solid #E8D5B0;border-radius:var(--rs);padding:12px;margin:8px 16px 0;display:flex;gap:10px;align-items:center}
+.apibt{font-size:12px;color:var(--t2);flex:1}
+.apisb{font-size:12px;color:var(--pri);font-weight:700;cursor:pointer;border:none;background:none;font-family:inherit;white-space:nowrap}
+/* FAB */
+.fab{position:fixed;bottom:calc(var(--nav)+20px);right:max(20px,calc(50vw - 215px + 20px));width:52px;height:52px;border-radius:50%;background:var(--pri);color:#fff;font-size:26px;border:none;cursor:pointer;box-shadow:var(--shl);display:none;align-items:center;justify-content:center;transition:transform .2s,background .2s;z-index:100}
+.fab.show{display:flex}
+.fab:active{transform:scale(.93);background:var(--pdk)}
+/* Calendar */
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 4px}
+.ch{text-align:center;font-size:10px;font-weight:700;color:var(--t3);padding:5px 0}
+.cc{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:default;background:var(--surface);border:1px solid var(--bdr)}
+.cc.trip{background:#FFF5EE;border-color:var(--acc);cursor:pointer}
+.cc.trip:hover{background:#FFEDE0}
+.cc.emp{background:transparent;border-color:transparent}
+.cnum{font-size:12px;font-weight:600;color:var(--txt)}
+.cc.emp .cnum{color:var(--t3)}
+.cdot{width:4px;height:4px;border-radius:50%;background:var(--acc);margin-top:2px}
+.ovrow{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--s2);cursor:pointer}
+.ovrow:last-child{border:none}
+.ovnum{width:32px;height:32px;background:var(--pri);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(61,43,31,.55);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.on{display:flex}
+.modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-width:430px;max-height:90dvh;overflow-y:auto;padding:16px 20px 40px;animation:sU .28s ease}
+@keyframes sU{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;border-radius:2px;background:var(--bdr);margin:0 auto 16px}
+.mtitle{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--pdk);margin-bottom:16px}
+.fg{margin-bottom:13px}
+.fl{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:4px;display:block}
+.fi{width:100%;padding:10px 12px;border:1.5px solid var(--bdr);border-radius:var(--rs);background:var(--bg);color:var(--txt);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--pri)}
+.frow{display:flex;gap:10px}
+.frow .fg{flex:1}
+.btnp{width:100%;padding:13px;background:var(--pri);color:#fff;border:none;border-radius:var(--rs);font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .2s}
+.btnp:hover{background:var(--pdk)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.chip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--bdr);font-size:12px;cursor:pointer;transition:all .2s;background:none;color:var(--t2);font-family:inherit}
+.chip.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+/* Receipt */
+.rupload{border:2px dashed var(--bdr);border-radius:var(--rs);padding:18px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:var(--bg);position:relative;margin-bottom:6px}
+.rupload:hover{border-color:var(--acc);background:#FFF9F5}
+.rupload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.rprev{max-width:100%;border-radius:8px;margin-top:8px;display:none}
+.ocr{background:var(--s2);border-radius:var(--rs);padding:9px 12px;margin-bottom:8px;font-size:12px;color:var(--t2);display:none}
+/* Info box */
+.info{background:var(--s2);border-radius:var(--rs);padding:10px 14px;font-size:13px;color:var(--t2);line-height:2}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hdr">
+    <div>
+      <h1>🦘 澳洲之旅 2026</h1>
+      <div class="sub">6/25 – 7/12 · 18天</div>
+    </div>
+    <div style="font-size:22px">✈️</div>
+  </div>
+  <div id="main">
+
+    <!-- TAB 1: 行程 -->
+    <div id="t-itin" class="tab on">
+      <div id="strip"></div>
+      <div id="dview"></div>
+    </div>
+
+    <!-- TAB 2: 交通 -->
+    <div id="t-trans" class="tab">
+      <div class="sl">確認航班</div>
+      <div id="flist"></div>
+      <div class="sl" style="margin-top:16px">⚠️ 待購票/預訂</div>
+      <div id="tlist"></div>
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- TAB 3: 住宿 -->
+    <div id="t-accom" class="tab">
+      <div class="sl">墨爾本 6/25–7/3</div>
+      <div class="ac">
+        <div class="acc">Melbourne · Southbank</div>
+        <div class="acn">Eating 媽媽家</div>
+        <div class="aca">285 City Rd, Southbank VIC 3006</div>
+        <div class="acbts">
+          <a class="btnol" href="https://www.google.com/maps/search/?api=1&query=285+City+Rd+Southbank+VIC+3006" target="_blank">📍 地圖</a>
+        </div>
+      </div>
+      <div class="sl" style="margin-top:14px">雪梨 7/3–7/12（Chi）</div>
+      <div class="ac">
+        <div class="acc">Sydney · Baulkham Hills</div>
+        <div class="acn">Claire 家</div>
+        <div class="aca">2/65-69 Seven Hills Road, Baulkham Hills NSW 2153</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:5px">📞 0493 429 378</div>
+        <div class="acbts">
+          <a class="btnol" href="https://www.google.com/maps/search/?api=1&query=65+Seven+Hills+Road+Baulkham+Hills+NSW" target="_blank">📍 地圖</a>
+          <a class="btnol" href="tel:0493429378">📞 撥打</a>
+        </div>
+      </div>
+      <div class="sl" style="margin-top:14px">雪梨（Ping）</div>
+      <div class="ac">
+        <div class="acc">Sydney · Neutral Bay</div>
+        <div class="acn">Ping 住宿</div>
+        <div class="aca">29 Military Rd, Neutral Bay NSW 2089</div>
+        <div class="acbts">
+          <a class="btnol" href="https://www.google.com/maps/search/?api=1&query=29+Military+Rd+Neutral+Bay+NSW" target="_blank">📍 地圖</a>
+        </div>
+      </div>
+      <div class="sl" style="margin-top:14px">旅行證件</div>
+      <div class="card"><div class="info">
+        🛂 澳洲 ETA：已完成<br>
+        📶 Optus 65GB：已購<br>
+        🛡 富邦產險 C 方案：NT$2,697<br>
+        <span style="font-size:11px;color:var(--t3)">序號 572986612495</span><br>
+        ✈️ KrisFlyer：8756468445<br>
+        📋 訂位代號：E8D3OL
+      </div></div>
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- TAB 4: 行李 -->
+    <div id="t-lug" class="tab">
+      <div class="card">
+        <div class="ct">行李限額</div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;background:var(--s2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:700;color:var(--pri)">25</div>
+            <div style="font-size:11px;color:var(--t3)">kg 國際航班</div>
+          </div>
+          <div style="flex:1;background:var(--s2);border-radius:10px;padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:700;color:var(--acc)">23</div>
+            <div style="font-size:11px;color:var(--t3)">kg VA897 國內線</div>
+          </div>
+        </div>
+      </div>
+      <div class="sl" style="display:flex;align-items:center;justify-content:space-between;padding-right:16px">
+        <span>打包清單</span><span id="pcnt" style="font-size:11px;color:var(--t3)"></span>
+      </div>
+      <div class="card" style="padding-top:8px">
+        <div id="plist"></div>
+        <button onclick="addPack()" style="margin-top:12px;display:flex;align-items:center;gap:6px;color:var(--acc);font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;font-family:inherit">＋ 新增項目</button>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- TAB 5: 記帳 -->
+    <div id="t-acc" class="tab">
+      <div class="etbanner">
+        <div class="etlbl">個人總花費</div>
+        <div class="etaud" id="etaud">AUD 0.00</div>
+        <div class="ettwd" id="ettwd">≈ TWD 0</div>
+      </div>
+      <div class="apib" id="apib">
+        <div style="font-size:22px">🤖</div>
+        <div class="apibt">設定 OpenAI API Key，拍照自動辨識收據</div>
+        <button class="apisb" onclick="openMd('api-modal')">設定</button>
+      </div>
+      <div class="sl" style="display:flex;align-items:center;justify-content:space-between;padding-right:16px">
+        <span>消費記錄</span><span id="ecnt" style="font-size:11px;color:var(--t3)"></span>
+      </div>
+      <div id="elist"></div>
+      <div style="height:80px"></div>
+    </div>
+
+    <!-- TAB 6: 月曆 -->
+    <div id="t-cal" class="tab">
+      <div class="sl">6月 June 2026</div>
+      <div class="card" style="padding:12px"><div class="cgrid" id="cjun"></div></div>
+      <div class="sl" style="margin-top:10px">7月 July 2026</div>
+      <div class="card" style="padding:12px"><div class="cgrid" id="cjul"></div></div>
+      <div class="card" style="margin-top:10px">
+        <div class="ct">全程速覽</div>
+        <div id="ovlist"></div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+
+  </div>
+  <nav id="nav">
+    <button class="ni on" data-t="itin" onclick="sw('itin',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>行程</span>
+    </button>
+    <button class="ni" data-t="trans" onclick="sw('trans',this)">
+      <svg viewBox="0 0 24 24"><path d="M17.8 19.2L16 11l3.5-3.5A2 2 0 0019 4c-.6 0-1.2.3-1.6.8L14 8l-8.2-1.8c-.5-.1-.9.1-1.1.5l-.5.8c-.2.4-.1.8.2 1.1l5.5 3.7-1.6 2.9H5l-.8.8.9 1 2.3-.5.8.9 1 .9.8-.8V18l2.9-1.6 3.7 5.5c.3.3.7.4 1.1.2l.8-.5c.4-.3.6-.7.5-1.2z"/></svg>
+      <span>交通</span>
+    </button>
+    <button class="ni" data-t="accom" onclick="sw('accom',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>住宿</span>
+    </button>
+    <button class="ni" data-t="lug" onclick="sw('lug',this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      <span>行李</span>
+    </button>
+    <button class="ni" data-t="acc" onclick="sw('acc',this)">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>記帳</span>
+    </button>
+    <button class="ni" data-t="cal" onclick="sw('cal',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/></svg>
+      <span>月曆</span>
+    </button>
+  </nav>
+</div>
+
+<button class="fab" id="fab" onclick="openExpMd()">＋</button>
+
+<!-- Expense Modal -->
+<div class="overlay" id="exp-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">新增消費</div>
+    <div class="rupload" id="rup">
+      <input type="file" id="rfile" accept="image/*" capture="environment" onchange="handleOCR(event)">
+      <div style="font-size:28px;margin-bottom:6px">📷</div>
+      <div style="font-size:13px;color:var(--t3)">拍照或上傳收據（自動辨識）</div>
+      <img class="rprev" id="rprev">
+    </div>
+    <div class="ocr" id="ocrr"></div>
+    <div id="ocrl" style="display:none;text-align:center;padding:8px;font-size:12px;color:var(--t3)">🤖 辨識中...</div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">金額 AUD *</label>
+        <input class="fi" type="number" id="eamt" placeholder="0.00" step="0.01">
+      </div>
+      <div class="fg">
+        <label class="fl">日期</label>
+        <input class="fi" type="date" id="edate">
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">商家／說明 *</label>
+      <input class="fi" type="text" id="emch" placeholder="例：Coles 超市">
+    </div>
+    <div class="fg">
+      <label class="fl">類別</label>
+      <div class="chips" id="catc"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">備注（分帳說明）</label>
+      <input class="fi" type="text" id="enot" placeholder="例：4人AA，我付 AUD 20">
+    </div>
+    <button class="btnp" onclick="saveExp()">記帳</button>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div class="overlay" id="api-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">🤖 OCR 設定</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.7">輸入 OpenAI API Key 即可拍照自動辨識收據（gpt-4o）。<br><span style="font-size:11px;color:var(--t3)">Key 僅存於您的瀏覽器，不會上傳至任何伺服器。</span></div>
+    <div class="fg">
+      <label class="fl">OpenAI API Key</label>
+      <input class="fi" type="password" id="aki" placeholder="sk-...">
+    </div>
+    <button class="btnp" onclick="saveKey()">儲存</button>
+    <button onclick="clearKey()" style="width:100%;margin-top:10px;padding:10px;border:none;background:none;color:var(--danger);font-size:13px;cursor:pointer;font-family:inherit">清除 API Key</button>
+  </div>
+</div>
+
+<!-- Edit Activity Modal -->
+<div class="overlay" id="edit-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle" id="edit-modal-title">✏️ 編輯行程</div>
+    <div class="fg"><label class="fl">時間</label><input class="fi" id="etime" placeholder="09:00"></div>
+    <div class="fg"><label class="fl">活動內容 *</label><input class="fi" id="eact" placeholder="景點、活動說明..."></div>
+    <div class="fg"><label class="fl">備注</label><input class="fi" id="enotes2" placeholder="備注說明..."></div>
+    <div class="fg"><label class="fl">費用 AUD</label><input class="fi" type="number" id="ecost" placeholder="0"></div>
+    <div class="fg"><label class="fl">地圖連結（Google Maps URL）</label><input class="fi" id="emaps" placeholder="https://..."></div>
+    <div class="frow" style="margin-top:14px;gap:10px">
+      <button class="btnp" id="del-act-btn" style="background:var(--danger)" onclick="delAct()">刪除</button>
+      <button class="btnp" onclick="saveAct()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════ TRIP DATA ═══════════
+const D={
+flights:[
+  {seg:"去程一",fn:"SQ877",fr:"TPE (T2)",to:"SIN",dep:"14:25",arr:"19:00",date:"6/24",ac:"B787",st:"CONFIRMED",note:"桃園 T2 出發 → 樟宜 T3"},
+  {seg:"去程二",fn:"SQ237",fr:"SIN (T3)",to:"MEL (T2)",dep:"01:45",arr:"11:00",date:"6/25",ac:"A380",st:"CONFIRMED",note:"25kg 行李額度"},
+  {seg:"國內線",fn:"VA897",fr:"MEL (T3)",to:"SYD (T2)",dep:"20:45",arr:"22:10",date:"7/3",ac:"B737-800",st:"CONFIRMED",note:"座位 16A · Choice 票含 23kg · Virgin Australia"},
+  {seg:"回程一",fn:"SQ232",fr:"SYD (T1)",to:"SIN",dep:"11:00",arr:"17:30",date:"7/12",ac:"A380",st:"CONFIRMED",note:"行李直掛台北 · 新加坡可出境 14h50m"},
+  {seg:"回程二",fn:"SQ876",fr:"SIN (T3)",to:"TPE (T2)",dep:"08:20",arr:"13:10",date:"7/13",ac:"B787",st:"CONFIRMED",note:"抵達桃園 T2，返台！"}
+],
+tickets:[
+  {item:"藍山 Scenic World All-Ride Pass",date:"7/10 (週五)",price:"AUD 45/人",url:"https://www.scenicworld.com.au/",st:"⚠️ 建議線上預訂"}
+],
+days:[
+  {date:"2026-06-25",wd:"週四",theme:"抵達墨爾本・安頓",city:"Melbourne",cp:["Ping","Eating","小白"],
+   wx:{t:"8-13°C",c:"厚外套＋毛衣＋防水鞋＋圍巾"},
+   sch:[
+    {tm:"11:00",ac:"降落 Melbourne 機場 T2",tp:"transport",no:"入境+提領行李約 60min"},
+    {tm:"12:00",ac:"Uber XL 前往 Southbank 住宿",tp:"transport",cost:75,no:"4人+大行李選 Uber XL"},
+    {tm:"13:00",ac:"抵達 Eating 媽媽家・整理行李休息",tp:"rest",mp:"https://www.google.com/maps/search/?api=1&query=285+City+Rd+Southbank+VIC+3006"},
+    {tm:"15:30",ac:"Southbank 河濱散步・認識周邊",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Southbank+Promenade+Melbourne"},
+    {tm:"17:00",ac:"Coles 超市採買生活用品",tp:"shopping",cost:30,mp:"https://www.google.com/maps/search/?api=1&query=Coles+Southbank+Melbourne"},
+    {tm:"19:00",ac:"晚餐",tp:"meal"}
+   ],cost:{a:130,t:2730}},
+  {date:"2026-06-26",wd:"週五",theme:"自由日・St. Ali Café・市區漫步",city:"Melbourne",cp:["Ping","Eating","小白"],
+   wx:{t:"8-14°C",c:"外套＋毛衣＋舒適步行鞋"},
+   sch:[
+    {tm:"晚起",ac:"睡到自然醒，輕鬆早午餐",tp:"rest"},
+    {tm:"11:00",ac:"St. Ali Coffee 精品咖啡",tp:"cafe",cost:8,mp:"https://www.google.com/maps/search/?api=1&query=St+Ali+Coffee+South+Melbourne"},
+    {tm:"12:30",ac:"South Melbourne Market 逛逛",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=South+Melbourne+Market"},
+    {tm:"14:00",ac:"CBD 漫步：Hosier Lane・Fed Square・Flinders St",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Hosier+Lane+Melbourne"},
+    {tm:"17:00",ac:"返回住宿休息",tp:"rest"},
+    {tm:"19:00",ac:"晚餐",tp:"meal"}
+   ],cost:{a:48,t:1008}},
+  {date:"2026-06-27",wd:"週六",theme:"Mornington 半島一日遊",city:"Mornington Peninsula",cp:["Ping","Eating","小白"],
+   wx:{t:"7-13°C",c:"防風外套＋厚毛衣＋防水鞋＋帽子"},
+   sch:[
+    {tm:"09:00",ac:"出發 Mornington Peninsula（Eating 媽媽開車，約 1.5hr）",tp:"transport"},
+    {tm:"10:30",ac:"Mornington 小鎮 Main Street 逛逛",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Mornington+Main+Street+Victoria"},
+    {tm:"11:30",ac:"Arthurs Seat 鷹眼纜車（可選，AUD 25/人）",tp:"sightseeing",cost:25,mp:"https://www.google.com/maps/search/?api=1&query=Arthurs+Seat+Eagle+Mornington+Peninsula"},
+    {tm:"13:00",ac:"午餐（Mornington 小鎮）",tp:"meal"},
+    {tm:"14:30",ac:"Cape Schanck 燈塔或海岸線散步",tp:"nature",mp:"https://www.google.com/maps/search/?api=1&query=Cape+Schanck+Lighthouse+Victoria"},
+    {tm:"16:30",ac:"Red Hill 酒莊區兜風",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Red+Hill+Winery+Mornington+Peninsula"},
+    {tm:"18:00",ac:"驅車返回 Southbank（約 1.5hr）",tp:"transport"},
+    {tm:"19:30",ac:"晚餐",tp:"meal"}
+   ],cost:{a:65,t:1365}},
+  {date:"2026-06-28",wd:"週日",theme:"Rose St. Market + QV Market",city:"Melbourne",cp:["Ping","Eating","小白"],
+   wx:{t:"8-14°C",c:"外套＋舒適步行鞋"},
+   sch:[
+    {tm:"09:30",ac:"Rose St. Artist Market（Fitzroy，週末限定 10-17時）",tp:"market",mp:"https://www.google.com/maps/search/?api=1&query=Rose+Street+Artists+Market+Fitzroy+Melbourne",no:"手工藝品設計市集"},
+    {tm:"11:30",ac:"電車前往 Queen Victoria Market",tp:"transport"},
+    {tm:"12:00",ac:"QV Market 逛逛 + 熟食午餐",tp:"meal",mp:"https://www.google.com/maps/search/?api=1&query=Queen+Victoria+Market+Melbourne",no:"週日有生鮮市場＋熟食攤位"},
+    {tm:"14:30",ac:"周邊咖啡館休息",tp:"cafe",cost:12},
+    {tm:"16:00",ac:"返回 Southbank",tp:"rest"}
+   ],cost:{a:98,t:2058}},
+  {date:"2026-06-29",wd:"週一",theme:"自由日・DFO South Wharf 採購",city:"Melbourne",cp:["Ping","Eating","小白"],
+   wx:{t:"7-13°C",c:"外套＋舒適步行鞋"},
+   sch:[
+    {tm:"晚起",ac:"睡到自然醒，輕鬆早午餐",tp:"rest"},
+    {tm:"11:00",ac:"早午餐",tp:"meal"},
+    {tm:"13:00",ac:"DFO South Wharf Outlet 採購（步行可達）",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=DFO+South+Wharf+Melbourne",no:"Aesop、運動品牌、澳洲本地品牌"},
+    {tm:"16:30",ac:"Aesop South Wharf 選購",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=Aesop+South+Wharf+Melbourne"},
+    {tm:"18:00",ac:"返回住宿休息",tp:"rest"},
+    {tm:"19:30",ac:"晚餐",tp:"meal"}
+   ],cost:{a:190,t:3990}},
+  {date:"2026-06-30",wd:"週二",theme:"大洋路 Great Ocean Road",city:"Great Ocean Road",cp:["Ping","Eating","小白"],
+   wx:{t:"6-13°C",c:"防風防水外套＋厚毛衣＋防水鞋＋帽子"},
+   sch:[
+    {tm:"08:00",ac:"出發（Eating 媽媽包車+導遊，已安排好）",tp:"transport"},
+    {tm:"09:00",ac:"Torquay 大洋路起點牌 + Bells Beach",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Bells+Beach+Torquay+Victoria"},
+    {tm:"10:30",ac:"沿路海景 + Aireys Inlet 燈塔",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Aireys+Inlet+Lighthouse+Victoria"},
+    {tm:"12:30",ac:"Apollo Bay 午餐（已確認）",tp:"meal",mp:"https://www.google.com/maps/search/?api=1&query=Apollo+Bay+restaurants+Victoria"},
+    {tm:"14:00",ac:"Erskine Falls 瀑布步行（約 30min）",tp:"nature",mp:"https://www.google.com/maps/search/?api=1&query=Erskine+Falls+Lorne+Victoria"},
+    {tm:"16:00",ac:"🪨 十二門徒石 12 Apostles",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Twelve+Apostles+Great+Ocean+Road",no:"免費入場，日落前景色最美"},
+    {tm:"17:30",ac:"Loch Ard Gorge（若時間允許）",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Loch+Ard+Gorge+Victoria"},
+    {tm:"18:00",ac:"驅車返回 Southbank（約 3hr）",tp:"transport"}
+   ],cost:{a:45,t:945,no:"包車費 Eating 媽媽安排"}},
+  {date:"2026-07-01",wd:"週三",theme:"St Kilda Beach 海灘漫遊",city:"Melbourne",cp:["Ping","Eating","小白"],
+   wx:{t:"8-14°C",c:"外套＋舒適步行鞋"},
+   sch:[
+    {tm:"10:00",ac:"電車前往 St Kilda（Route 96）",tp:"transport"},
+    {tm:"10:30",ac:"St Kilda Beach 海灘散步",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=St+Kilda+Beach+Melbourne"},
+    {tm:"11:30",ac:"St Kilda Pier + 遠眺 Melbourne Skyline",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=St+Kilda+Pier+Melbourne"},
+    {tm:"12:30",ac:"午餐",tp:"meal"},
+    {tm:"14:00",ac:"Acland Street 蛋糕店 + 閒逛",tp:"cafe",cost:12,mp:"https://www.google.com/maps/search/?api=1&query=Acland+Street+St+Kilda+Melbourne"},
+    {tm:"15:00",ac:"Luna Park 外觀打卡（免費）",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Luna+Park+St+Kilda+Melbourne"},
+    {tm:"16:30",ac:"返回 Southbank",tp:"transport"},
+    {tm:"19:00",ac:"晚餐",tp:"meal"}
+   ],cost:{a:70,t:1470}},
+  {date:"2026-07-02",wd:"週四",theme:"NGV 美術館 + 墨爾本最後巡禮",city:"Melbourne",cp:["Ping","Eating","小白"],
+   wx:{t:"8-14°C",c:"外套＋毛衣＋舒適步行鞋"},
+   sch:[
+    {tm:"09:30",ac:"Good Measure Coffee（與 Ping）",tp:"cafe",cost:8,mp:"https://www.google.com/maps/search/?api=1&query=Good+Measure+Melbourne"},
+    {tm:"10:30",ac:"NGV International 維多利亞國家美術館",tp:"art",mp:"https://www.google.com/maps/search/?api=1&query=NGV+International+Melbourne",no:"常設展免費，特展另計約 AUD 25"},
+    {tm:"13:00",ac:"午餐（NGV 附近）",tp:"meal"},
+    {tm:"14:30",ac:"Aesop Melbourne CBD（若未購）",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=Aesop+Melbourne+CBD"},
+    {tm:"15:30",ac:"墨爾本市區最後採購",tp:"leisure"},
+    {tm:"17:00",ac:"返回住宿打包行李",tp:"rest",no:"明晚 20:45 飛雪梨，行李 ≤ 23kg"},
+    {tm:"19:00",ac:"墨爾本最後一頓晚餐",tp:"meal"}
+   ],cost:{a:115,t:2415}},
+  {date:"2026-07-03",wd:"週五",theme:"墨爾本最後半天・傍晚飛雪梨",city:"Melbourne → Sydney",cp:["Ping"],
+   wx:{t:"MEL 8°C / SYD 18°C",c:"薄外套，Sydney 稍暖"},
+   sch:[
+    {tm:"09:00",ac:"早餐 + 最後行李確認（≤ 23kg）",tp:"rest"},
+    {tm:"10:30",ac:"Good Measure Coffee（最後一杯）",tp:"cafe",cost:8,mp:"https://www.google.com/maps/search/?api=1&query=Good+Measure+Melbourne"},
+    {tm:"11:30",ac:"CBD 最後散步",tp:"leisure"},
+    {tm:"13:00",ac:"午餐（墨爾本最後一餐）",tp:"meal"},
+    {tm:"16:00",ac:"取行李・道別 Eating 一家",tp:"rest"},
+    {tm:"17:30",ac:"Uber 前往 Melbourne Airport T3（約 35min）",tp:"transport",cost:60,no:"⚠️ VA897 在 T3，建議 17:30 出門"},
+    {tm:"20:45",ac:"✈️ VA897 MEL T3 → SYD T2（1hr25min）",tp:"transport",no:"Boeing 737-800 · 座位 16A"},
+    {tm:"22:10",ac:"抵達 SYD · Uber 前往 Baulkham Hills（約 50min）",tp:"transport",cost:65,no:"約 23:00 到 Claire 家，提前告知"}
+   ],cost:{a:160,t:3360}},
+  {date:"2026-07-04",wd:"週六",theme:"The Rocks 市集 + 雪梨新魚市場",city:"Sydney",cp:["Ping","Claire"],
+   wx:{t:"10-18°C",c:"薄外套＋毛衣＋舒適步行鞋"},
+   sch:[
+    {tm:"09:00",ac:"出發 The Rocks（Claire 開車，約 40min）",tp:"transport"},
+    {tm:"10:00",ac:"The Rocks Market（週六日限定 10:00-17:00）",tp:"market",mp:"https://www.google.com/maps/search/?api=1&query=The+Rocks+Market+Sydney",no:"手工藝品、澳洲本地設計，週末限定"},
+    {tm:"11:30",ac:"The Rocks 歷史街區漫步",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=The+Rocks+Sydney"},
+    {tm:"13:00",ac:"雪梨新魚市場午餐（Sydney Fish Market）",tp:"meal",cost:40,mp:"https://www.google.com/maps/search/?api=1&query=Sydney+Fish+Market+Pyrmont",no:"新館 2024 底開幕，Blackwattle Bay"},
+    {tm:"15:00",ac:"Circular Quay + 歌劇院外觀預覽",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Circular+Quay+Sydney"},
+    {tm:"16:30",ac:"返回 Baulkham Hills",tp:"transport"}
+   ],cost:{a:65,t:1365}},
+  {date:"2026-07-05",wd:"週日",theme:"Hunter Valley 酒莊 Day 1（住一晚）",city:"Hunter Valley",cp:["Ping","Claire"],
+   wx:{t:"5-16°C",c:"厚外套＋毛衣＋舒適步行鞋"},
+   sch:[
+    {tm:"09:00",ac:"出發前往 Hunter Valley（Claire 開車，約 2hr）",tp:"transport"},
+    {tm:"11:00",ac:"Brokenwood Wines 酒莊試飲",tp:"leisure",cost:15,mp:"https://www.google.com/maps/search/?api=1&query=Brokenwood+Wines+Hunter+Valley"},
+    {tm:"13:00",ac:"午餐（酒莊附近）",tp:"meal"},
+    {tm:"14:30",ac:"Tyrrell's Wines 試飲",tp:"leisure",cost:10,mp:"https://www.google.com/maps/search/?api=1&query=Tyrrells+Wines+Hunter+Valley"},
+    {tm:"16:00",ac:"Pokolbin Village 小鎮漫步 / 起司店",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Hunter+Valley+Wine+Country+Village"},
+    {tm:"18:00",ac:"Check-in 住宿（Claire 已預訂）",tp:"rest"},
+    {tm:"19:30",ac:"晚餐",tp:"meal"}
+   ],cost:{a:115,t:2415,no:"住宿由 Claire 安排"}},
+  {date:"2026-07-06",wd:"週一",theme:"Hunter Valley Day 2・返回雪梨",city:"Hunter Valley → Sydney",cp:["Ping","Claire"],
+   wx:{t:"6-17°C",c:"厚外套"},
+   sch:[
+    {tm:"09:00",ac:"早餐 + 退房",tp:"rest"},
+    {tm:"10:00",ac:"Hunter Valley Gardens（可選，AUD 15）",tp:"leisure",cost:15,mp:"https://www.google.com/maps/search/?api=1&query=Hunter+Valley+Gardens"},
+    {tm:"11:30",ac:"驅車返回 Baulkham Hills（約 2hr）",tp:"transport"},
+    {tm:"14:00",ac:"抵達 Claire 家・午餐 + 休息",tp:"rest"},
+    {tm:"19:00",ac:"晚餐",tp:"meal"}
+   ],cost:{a:65,t:1365}},
+  {date:"2026-07-07",wd:"週二",theme:"Taronga Zoo 動物園",city:"Sydney - Mosman",cp:["Ping"],
+   wx:{t:"10-18°C",c:"薄外套＋舒適步行鞋"},
+   sch:[
+    {tm:"09:00",ac:"前往 Circular Quay 搭渡輪（Wharf 2）",tp:"transport",mp:"https://www.google.com/maps/search/?api=1&query=Circular+Quay+Ferry+Wharf+Sydney"},
+    {tm:"10:00",ac:"🚢 渡輪至 Taronga Zoo Wharf（約 12min，景色絕美）",tp:"transport",no:"Opal Card 搭乘，單程約 AUD 4"},
+    {tm:"10:15",ac:"🦁 Taronga Zoo 全天遊覽",tp:"attraction",cost:47,mp:"https://www.google.com/maps/search/?api=1&query=Taronga+Zoo+Sydney",no:"必看：無尾熊、袋鼠、袋熊 · 可俯瞰雪梨港灣"},
+    {tm:"13:00",ac:"園內午餐",tp:"meal",cost:20},
+    {tm:"15:30",ac:"渡輪返回 Circular Quay",tp:"transport"},
+    {tm:"17:00",ac:"返回 Baulkham Hills",tp:"transport"},
+    {tm:"19:00",ac:"晚餐",tp:"meal"}
+   ],cost:{a:122,t:2562}},
+  {date:"2026-07-08",wd:"週三",theme:"Bondi Beach",city:"Sydney - Bondi",cp:["Ping"],
+   wx:{t:"10-18°C",c:"薄外套＋帽子（海邊風大）"},
+   sch:[
+    {tm:"10:00",ac:"Bondi Beach 海灘漫步",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Bondi+Beach+Sydney"},
+    {tm:"11:00",ac:"Bondi Icebergs Pool 外觀打卡",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Bondi+Icebergs+Pool+Sydney"},
+    {tm:"12:30",ac:"午餐（Bondi 周邊）",tp:"meal"},
+    {tm:"14:00",ac:"Bondi to Coogee 海岸步道（部分段）",tp:"nature",mp:"https://www.google.com/maps/search/?api=1&query=Bondi+to+Coogee+Coastal+Walk",no:"全程 6km，可走至 Clovelly"},
+    {tm:"16:00",ac:"返回 Baulkham Hills",tp:"transport"}
+   ],cost:{a:75,t:1575}},
+  {date:"2026-07-09",wd:"週四",theme:"雪梨市區逛逛 + 歌劇院外觀",city:"Sydney",cp:["Ping"],
+   wx:{t:"10-18°C",c:"薄外套＋舒適步行鞋"},
+   sch:[
+    {tm:"09:30",ac:"前往 Circular Quay",tp:"transport"},
+    {tm:"10:30",ac:"🎭 雪梨歌劇院外觀拍照（免費）",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Sydney+Opera+House",no:"最佳拍照點：Circular Quay 碼頭、Mrs Macquarie's Chair"},
+    {tm:"11:30",ac:"Mrs Macquarie's Chair 港灣全景",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Mrs+Macquaries+Chair+Sydney"},
+    {tm:"12:30",ac:"Royal Botanic Garden 散步",tp:"nature",mp:"https://www.google.com/maps/search/?api=1&query=Royal+Botanic+Garden+Sydney"},
+    {tm:"13:30",ac:"午餐",tp:"meal"},
+    {tm:"15:00",ac:"雪梨市區逛逛（QVB / Pitt Street Mall）",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Queen+Victoria+Building+Sydney"},
+    {tm:"17:00",ac:"返回 Baulkham Hills",tp:"transport"}
+   ],cost:{a:70,t:1470}},
+  {date:"2026-07-10",wd:"週五",theme:"藍山國家公園（Claire 開車）",city:"Blue Mountains",cp:["Ping","Claire"],
+   wx:{t:"3-12°C",c:"厚外套＋毛衣＋防水鞋＋帽子"},
+   sch:[
+    {tm:"08:00",ac:"出發前往藍山（Claire 開車，約 1.5-2hr）",tp:"transport"},
+    {tm:"10:00",ac:"Echo Point 回音角・三姊妹岩 Three Sisters",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Echo+Point+Three+Sisters+Katoomba"},
+    {tm:"11:00",ac:"🚡 Scenic World All-Ride Pass",tp:"attraction",cost:45,mp:"https://www.google.com/maps/search/?api=1&query=Scenic+World+Katoomba+NSW",no:"⚠️ 建議線上預訂 | 纜車下→最陡鐵路上→空中步道"},
+    {tm:"13:30",ac:"午餐（Leura 或 Katoomba）",tp:"meal"},
+    {tm:"15:00",ac:"Leura 小鎮漫步",tp:"leisure",cost:10,mp:"https://www.google.com/maps/search/?api=1&query=Leura+Village+NSW"},
+    {tm:"16:30",ac:"返回 Baulkham Hills（約 1.5-2hr）",tp:"transport"}
+   ],cost:{a:90,t:1890}},
+  {date:"2026-07-11",wd:"週六",theme:"自由日・雪梨最後採購",city:"Sydney",cp:["Ping"],
+   wx:{t:"10-18°C",c:"薄外套"},
+   sch:[
+    {tm:"晚起",ac:"睡到自然醒，輕鬆早午餐",tp:"rest"},
+    {tm:"11:00",ac:"Sydney CBD 最後採購（Aesop、衝浪用品、伴手禮）",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=Sydney+CBD+shopping"},
+    {tm:"13:00",ac:"午餐",tp:"meal"},
+    {tm:"15:00",ac:"自由閒逛或咖啡館",tp:"leisure"},
+    {tm:"17:00",ac:"返回 Claire 家",tp:"rest"},
+    {tm:"18:00",ac:"打包行李（明早 07:30 出發）",tp:"rest",no:"確認行李 ≤ 25kg · 準備新加坡出境背包"},
+    {tm:"19:00",ac:"澳洲最後一頓晚餐 🥂",tp:"meal"}
+   ],cost:{a:185,t:3885}},
+  {date:"2026-07-12",wd:"週日",theme:"SYD 出發・新加坡魚尾獅・返台",city:"Sydney → Singapore → Taipei",cp:["獨自"],
+   wx:{t:"SYD 10°C / SIN 30°C",c:"機場薄外套，新加坡很熱"},
+   sch:[
+    {tm:"07:30",ac:"Uber 從 Claire 家至 SYD T1（約 45-50min）",tp:"transport",cost:65,no:"⚠️ 不晚於 07:30 出發 · SQ232 在 T1"},
+    {tm:"08:30",ac:"Check-in + 安檢（行李直掛台北）",tp:"transport",no:"向 SQ 確認行李直掛台北，出境新加坡不需提領"},
+    {tm:"11:00",ac:"✈️ SQ232 SYD → SIN（7hr50min）",tp:"transport"},
+    {tm:"17:30",ac:"抵達新加坡樟宜・出境（台灣護照免簽）",tp:"transport"},
+    {tm:"18:00",ac:"MRT 前往市區（Airport→Tanah Merah→Bayfront，約 30min）",tp:"transport"},
+    {tm:"18:30",ac:"🦁 Merlion Park 魚尾獅公園（免費）",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Merlion+Park+Singapore"},
+    {tm:"19:30",ac:"晚餐（Lau Pa Sat 老巴剎小販中心）",tp:"meal",mp:"https://www.google.com/maps/search/?api=1&query=Lau+Pa+Sat+Singapore"},
+    {tm:"21:30",ac:"返回樟宜機場候機",tp:"transport"},
+    {tm:"翌日 08:20",ac:"✈️ SQ876 SIN → TPE，13:10 抵達桃園，返台！",tp:"transport"}
+   ],cost:{a:65,t:1365}}
+]};
+
+// ═══════════ STATE ═══════════
+let curDay=0, selCat='food', editDayI=-1, editActI=-1;
+const LS=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch{return f}};
+const SS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+let exps=LS('aus_exp',[]);
+let packs=LS('aus_pack',defaultPacks());
+let edits=LS('aus_edits',{});
+let apiKey=localStorage.getItem('aus_key')||'';
+
+function defaultPacks(){return[
+  {id:1,t:'護照 + 影本',c:false},{id:2,t:'澳洲 ETA（截圖存手機）',c:false},
+  {id:3,t:'機票（SQ877/SQ237/VA897/SQ232/SQ876）',c:false},{id:4,t:'旅遊保險單（富邦 C 方案）',c:false},
+  {id:5,t:'Optus SIM 卡',c:false},{id:6,t:'信用卡/提款卡（多張）',c:false},
+  {id:7,t:'澳幣現金（小額備用）',c:false},{id:8,t:'手機充電器 + 轉接頭（澳規三孔扁頭）',c:false},
+  {id:9,t:'行動電源（≤100Wh 可帶上機）',c:false},{id:10,t:'厚外套（墨爾本冬天）',c:false},
+  {id:11,t:'薄外套（雪梨用）',c:false},{id:12,t:'毛衣／厚毛衣',c:false},
+  {id:13,t:'防水鞋／運動鞋',c:false},{id:14,t:'帽子 + 圍巾',c:false},
+  {id:15,t:'泳衣（溫泉/海灘）',c:false},{id:16,t:'洗漱用品（<100ml）',c:false},
+  {id:17,t:'常備藥（感冒/止瀉/暈車）',c:false},{id:18,t:'耳機',c:false},
+  {id:19,t:'相機 + 充電器',c:false},{id:20,t:'雨傘或輕薄雨衣',c:false}
+];}
+
+const CATS=[
+  {id:'food',e:'🍽',l:'餐飲'},{id:'transport',e:'🚌',l:'交通'},
+  {id:'attraction',e:'🎟',l:'景點'},{id:'shopping',e:'🛍',l:'購物'},
+  {id:'cafe',e:'☕',l:'咖啡'},{id:'accommodation',e:'🏨',l:'住宿'},{id:'other',e:'📌',l:'其他'}
+];
+const CAT_COL={meal:'#E8A045',transport:'#B09880',attraction:'#C4956A',rest:'#DDD0C0',cafe:'#C4956A',shopping:'#9B7EA5',leisure:'#7BAE7F',market:'#7BAE7F',nature:'#7BAE7F',art:'#7BAE7F',sightseeing:'#A67C5B'};
+
+// ═══════════ TAB SWITCH ═══════════
+function sw(t,el){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
+  document.getElementById('t-'+t).classList.add('on');
+  el.classList.add('on');
+  const fab=document.getElementById('fab');
+  fab.classList.toggle('show',t==='acc');
+  if(t==='acc')renderExp();
+  if(t==='lug')renderPack();
+}
+
+// ═══════════ DATE STRIP ═══════════
+function initStrip(){
+  const s=document.getElementById('strip');
+  const MO=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  D.days.forEach((day,i)=>{
+    const d=new Date(day.date);
+    const el=document.createElement('div');
+    el.className='dc'+(i===0?' on':'');
+    el.innerHTML=`<div class="dn">${d.getDate()}</div><div class="dd">${day.wd.replace('週','')}</div><div class="dm">${MO[d.getMonth()+1]}</div>`;
+    el.onclick=()=>selDay(i);
+    s.appendChild(el);
+  });
+}
+
+function selDay(i){
+  curDay=i;
+  document.querySelectorAll('.dc').forEach((c,j)=>c.classList.toggle('on',j===i));
+  renderDay(i);
+  document.getElementById('dview').scrollTop=0;
+}
+
+function getSch(i){return edits[i]||D.days[i].sch.map(s=>({...s}));}
+
+function renderDay(i){
+  const day=D.days[i];
+  const sch=getSch(i);
+  const MONTHS=['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const d=new Date(day.date);
+  let h=`
+  <div class="hero">
+    <div class="hdate">Day ${i+1} · ${d.getMonth()+1}/${d.getDate()} ${day.wd}</div>
+    <div class="htheme">${day.theme}</div>
+    <div class="hmeta">
+      <div class="hbadge">📍 ${day.city}</div>
+      <div class="hbadge">👥 ${day.cp.join('、')}</div>
+    </div>
+  </div>
+  <div class="wcard"><div class="wtemp">${day.wx.t}</div><div class="wcloth">👗 ${day.wx.c}</div></div>
+  <div class="sl">今日行程</div>
+  <div class="tl">`;
+  sch.forEach((item,j)=>{
+    const col=CAT_COL[item.tp]||'var(--pri)';
+    const costH=item.cost?`<span class="tcost">AUD ${item.cost}</span>`:'';
+    const mapH=item.mp?`<a class="tmap" href="${item.mp}" target="_blank">📍 地圖</a>`:'';
+    const notH=item.no?`<div class="tnotes">${item.no}</div>`:'';
+    h+=`<div class="ti">
+      <div class="ttime">${item.tm||''}</div>
+      <div class="twrap"><div class="tdot" style="background:${col}"></div>${j<sch.length-1?'<div class="tvline"></div>':''}</div>
+      <div class="tc" onclick="openEdit(${i},${j})">
+        <div class="tctitle">${item.ac}</div>
+        ${costH||mapH?`<div class="tcmeta">${costH}${mapH}</div>`:''}
+        ${notH}
+        <div class="elay">✏️</div>
+      </div>
+    </div>`;
+  });
+  h+=`</div>
+  <button class="addact" onclick="openNewAct(${i})">＋ 新增行程項目</button>
+  <div class="sl">費用估算</div>
+  <div class="csum">`;
+  if(day.cost){
+    h+=`<div class="ctrow"><div class="ctlabel">預估總計</div><div class="ctval">AUD ${day.cost.a}</div></div>
+    <div class="crow" style="margin-top:4px"><div style="font-size:11px;color:var(--t3)">≈ TWD ${day.cost.t.toLocaleString()}${day.cost.no?' · *'+day.cost.no:''}</div></div>`;
+  }
+  h+=`</div><div style="height:20px"></div>`;
+  document.getElementById('dview').innerHTML=h;
+}
+
+// ═══════════ ACTIVITY EDIT ═══════════
+function openEdit(di,ai){
+  editDayI=di; editActI=ai;
+  const it=getSch(di)[ai];
+  document.getElementById('etime').value=it.tm||'';
+  document.getElementById('eact').value=it.ac||'';
+  document.getElementById('enotes2').value=it.no||'';
+  document.getElementById('ecost').value=it.cost||'';
+  document.getElementById('emaps').value=it.mp||'';
+  document.getElementById('edit-modal-title').textContent='✏️ 編輯行程';
+  document.getElementById('del-act-btn').style.display='block';
+  openMd('edit-modal');
+}
+function openNewAct(di){
+  editDayI=di; editActI=-1;
+  ['etime','eact','enotes2','ecost','emaps'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('edit-modal-title').textContent='＋ 新增行程';
+  document.getElementById('del-act-btn').style.display='none';
+  openMd('edit-modal');
+}
+function saveAct(){
+  const ac=document.getElementById('eact').value.trim();
+  if(!ac){alert('請填寫活動內容');return;}
+  let sch=getSch(editDayI);
+  const it={tm:document.getElementById('etime').value,ac,no:document.getElementById('enotes2').value||undefined,cost:parseFloat(document.getElementById('ecost').value)||undefined,mp:document.getElementById('emaps').value||undefined,tp:'leisure'};
+  if(editActI===-1) sch.push(it);
+  else sch[editActI]={...sch[editActI],...it};
+  edits[editDayI]=sch; SS('aus_edits',edits);
+  closeMd('edit-modal'); renderDay(editDayI);
+}
+function delAct(){
+  let sch=getSch(editDayI);
+  sch.splice(editActI,1);
+  edits[editDayI]=sch; SS('aus_edits',edits);
+  closeMd('edit-modal'); renderDay(editDayI);
+}
+
+// ═══════════ FLIGHTS ═══════════
+function renderFlights(){
+  document.getElementById('flist').innerHTML=D.flights.map(f=>`
+  <div class="fc">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="fseg">${f.seg} · ${f.date}</div>
+      <span class="ftag fok">✓ 已確認</span>
+    </div>
+    <div class="froute">
+      <div class="fport">
+        <div class="fcode">${f.fr.split(' ')[0]}</div>
+        <div class="fcity">${f.fr}</div>
+        <div class="ftime">${f.dep}</div>
+      </div>
+      <div class="farrow">
+        <div class="fnum">${f.fn}</div>
+        <svg width="56" height="16" viewBox="0 0 56 16"><line x1="0" y1="8" x2="46" y2="8" stroke="var(--bdr)" stroke-width="1.5"/><polyline points="38,3 48,8 38,13" fill="none" stroke="var(--bdr)" stroke-width="1.5"/></svg>
+        <div class="fdur">${f.ac}</div>
+      </div>
+      <div class="fport" style="text-align:right">
+        <div class="fcode">${f.to.split(' ')[0]}</div>
+        <div class="fcity">${f.to}</div>
+        <div class="ftime">${f.arr}</div>
+      </div>
+    </div>
+    ${f.note?`<div class="fnote">ℹ️ ${f.note}</div>`:''}
+  </div>`).join('');
+  document.getElementById('tlist').innerHTML=D.tickets.map(t=>`
+  <div class="tkt">
+    <div class="tkts">${t.st}</div>
+    <div class="tkti">${t.item}</div>
+    <div class="tktd">📅 ${t.date} · 💰 ${t.price}</div>
+    <a class="tktl" href="${t.url}" target="_blank">→ 前往官網預訂</a>
+  </div>`).join('');
+}
+
+// ═══════════ PACKING ═══════════
+function renderPack(){
+  const done=packs.filter(p=>p.c).length;
+  document.getElementById('pcnt').textContent=`${done}/${packs.length} 完成`;
+  document.getElementById('plist').innerHTML=packs.map((p,i)=>`
+  <div class="pi">
+    <div class="pck ${p.c?'on':''}" onclick="togPack(${i})"></div>
+    <div class="ptxt ${p.c?'done':''}">${p.t}</div>
+    <div class="pdel" onclick="delPack(${i})">×</div>
+  </div>`).join('');
+}
+function togPack(i){packs[i].c=!packs[i].c;SS('aus_pack',packs);renderPack();}
+function delPack(i){packs.splice(i,1);SS('aus_pack',packs);renderPack();}
+function addPack(){const t=prompt('新增項目：');if(t&&t.trim()){packs.push({id:Date.now(),t:t.trim(),c:false});SS('aus_pack',packs);renderPack();}}
+
+// ═══════════ EXPENSES ═══════════
+function renderExp(){
+  const tot=exps.reduce((s,e)=>s+e.amt,0);
+  document.getElementById('etaud').textContent=`AUD ${tot.toFixed(2)}`;
+  document.getElementById('ettwd').textContent=`≈ TWD ${Math.round(tot*21).toLocaleString()}`;
+  document.getElementById('ecnt').textContent=`${exps.length} 筆`;
+  document.getElementById('apib').style.display=apiKey?'none':'flex';
+  const list=document.getElementById('elist');
+  if(!exps.length){list.innerHTML='<div style="text-align:center;padding:32px;color:var(--t3);font-size:13px">還沒有消費記錄<br>點右下角 ＋ 新增</div>';return;}
+  list.innerHTML=[...exps].reverse().map((e,ri)=>{
+    const i=exps.length-1-ri;
+    const cat=CATS.find(c=>c.id===e.cat)||CATS[6];
+    return`<div class="ei">
+      <div class="eico">${cat.e}</div>
+      <div class="einf">
+        <div class="emch">${e.mch}</div>
+        <div class="ecat">${cat.e} ${cat.l} · ${e.dt}</div>
+        ${e.no?`<div class="enot">📝 ${e.no}</div>`:''}
+      </div>
+      <div class="ert">
+        <div class="eamt">$${e.amt.toFixed(2)}</div>
+        <div class="edel" onclick="delExp(${i})">刪除</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openExpMd(){
+  document.getElementById('eamt').value='';
+  document.getElementById('emch').value='';
+  document.getElementById('enot').value='';
+  document.getElementById('edate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('rprev').style.display='none';
+  document.getElementById('ocrr').style.display='none';
+  document.getElementById('ocrl').style.display='none';
+  document.getElementById('rfile').value='';
+  selCat='food'; renderCats();
+  openMd('exp-modal');
+}
+function renderCats(){
+  document.getElementById('catc').innerHTML=CATS.map(c=>`<button class="chip ${c.id===selCat?'on':''}" onclick="selC('${c.id}')">${c.e} ${c.l}</button>`).join('');
+}
+function selC(id){selCat=id;renderCats();}
+function saveExp(){
+  const amt=parseFloat(document.getElementById('eamt').value);
+  const mch=document.getElementById('emch').value.trim();
+  if(!amt||!mch){alert('請填寫金額與商家名稱');return;}
+  exps.push({id:Date.now(),amt,mch,cat:selCat,dt:document.getElementById('edate').value,no:document.getElementById('enot').value.trim()});
+  SS('aus_exp',exps); closeMd('exp-modal'); renderExp();
+}
+function delExp(i){if(!confirm(`刪除「${exps[i].mch}」？`))return;exps.splice(i,1);SS('aus_exp',exps);renderExp();}
+
+// ═══════════ OCR ═══════════
+async function handleOCR(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const url=e.target.result;
+    const prev=document.getElementById('rprev');
+    prev.src=url; prev.style.display='block';
+    if(!apiKey){
+      const r=document.getElementById('ocrr');
+      r.style.display='block'; r.textContent='⚠️ 請先設定 OpenAI API Key';return;
+    }
+    document.getElementById('ocrl').style.display='block';
+    document.getElementById('ocrr').style.display='none';
+    try{
+      const res=await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+        body:JSON.stringify({model:'gpt-4o',max_tokens:200,messages:[{role:'user',content:[
+          {type:'image_url',image_url:{url}},
+          {type:'text',text:'從這張收據提取資訊，只輸出JSON不要其他文字：{"amount":數字,"merchant":"商家名","items":"品項描述"}。金額為AUD澳幣，找不到則null。'}
+        ]}]})
+      });
+      const data=await res.json();
+      const txt=data.choices?.[0]?.message?.content||'';
+      const p=JSON.parse(txt.replace(/```json|```/g,'').trim());
+      if(p.amount)document.getElementById('eamt').value=p.amount;
+      if(p.merchant)document.getElementById('emch').value=p.merchant;
+      if(p.items)document.getElementById('enot').value=p.items;
+      const r=document.getElementById('ocrr');
+      r.style.display='block'; r.innerHTML=`✅ <b>${p.merchant||'？'}</b> AUD ${p.amount||'？'}`;
+    }catch(err){
+      const r=document.getElementById('ocrr');
+      r.style.display='block'; r.textContent='❌ 辨識失敗，請手動填寫';
+    }
+    document.getElementById('ocrl').style.display='none';
+  };
+  reader.readAsDataURL(f);
+}
+
+// ═══════════ API KEY ═══════════
+function saveKey(){apiKey=document.getElementById('aki').value.trim();localStorage.setItem('aus_key',apiKey);closeMd('api-modal');renderExp();}
+function clearKey(){apiKey='';localStorage.removeItem('aus_key');closeMd('api-modal');renderExp();}
+function openApiKey(){document.getElementById('aki').value=apiKey;openMd('api-modal');}
+
+// ═══════════ CALENDAR ═══════════
+function renderCal(){
+  const trip={};
+  D.days.forEach((d,i)=>{const dt=new Date(d.date);trip[`${dt.getMonth()+1}-${dt.getDate()}`]=i;});
+  function buildMonth(id,yr,mo){
+    const cont=document.getElementById(id);
+    let h=['日','一','二','三','四','五','六'].map(x=>`<div class="ch">${x}</div>`).join('');
+    const fd=new Date(yr,mo-1,1).getDay();
+    const dim=new Date(yr,mo,0).getDate();
+    for(let i=0;i<fd;i++)h+=`<div class="cc emp"><div class="cnum"> </div></div>`;
+    for(let d=1;d<=dim;d++){
+      const key=`${mo}-${d}`;
+      if(key in trip){
+        h+=`<div class="cc trip" onclick="goDay(${trip[key]})"><div class="cnum">${d}</div><div class="cdot"></div></div>`;
+      }else{
+        h+=`<div class="cc"><div class="cnum" style="color:var(--t3)">${d}</div></div>`;
+      }
+    }
+    cont.innerHTML=h;
+  }
+  buildMonth('cjun',2026,6); buildMonth('cjul',2026,7);
+  document.getElementById('ovlist').innerHTML=D.days.map((d,i)=>`
+  <div class="ovrow" onclick="goDay(${i})">
+    <div class="ovnum">${i+1}</div>
+    <div style="flex:1">
+      <div style="font-size:11px;color:var(--t3)">${d.date} ${d.wd}</div>
+      <div style="font-size:13px;font-weight:500">${d.theme}</div>
+    </div>
+    <div style="color:var(--bdr);font-size:18px">›</div>
+  </div>`).join('');
+}
+
+function goDay(i){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
+  document.getElementById('t-itin').classList.add('on');
+  document.querySelector('[data-t="itin"]').classList.add('on');
+  document.getElementById('fab').classList.remove('show');
+  selDay(i);
+  setTimeout(()=>{
+    const chips=document.querySelectorAll('.dc');
+    if(chips[i])chips[i].scrollIntoView({behavior:'smooth',inline:'center'});
+  },50);
+}
+
+// ═══════════ MODALS ═══════════
+function openMd(id){document.getElementById(id).classList.add('on');}
+function closeMd(id){document.getElementById(id).classList.remove('on');}
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');});
+});
+
+// ═══════════ INIT ═══════════
+(function init(){
+  initStrip();
+  renderDay(0);
+  renderFlights();
+  renderCal();
+  // Auto-jump to today if in trip
+  const today=new Date().toISOString().split('T')[0];
+  const ti=D.days.findIndex(d=>d.date===today);
+  if(ti!==-1){
+    setTimeout(()=>{
+      selDay(ti);
+      const chips=document.querySelectorAll('.dc');
+      if(chips[ti])chips[ti].scrollIntoView({behavior:'smooth',inline:'center'});
+    },200);
+  }
+})();
+</script>
+</body>
+</html>
