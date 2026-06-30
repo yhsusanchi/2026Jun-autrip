@@ -357,7 +357,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 </div>
 
 <div class="lbox" id="lbox" onclick="this.classList.remove('on')"><img id="lboximg" src=""></div>
-<input type="file" id="attachFile" accept="image/*" capture="environment" class="ephotoin" onchange="handleAttachPhoto(event)">
+<input type="file" id="attachFile" accept="image/*" class="ephotoin" onchange="handleAttachPhoto(event)">
 
 <!-- Expense Modal -->
 <div class="overlay" id="exp-modal">
@@ -365,7 +365,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
     <div class="mhandle"></div>
     <div class="mtitle">新增消費</div>
     <div class="rupload" id="rup">
-      <input type="file" id="rfile" accept="image/*" capture="environment" onchange="handleOCR(event)">
+      <input type="file" id="rfile" accept="image/*" onchange="handleOCR(event)">
       <div style="font-size:28px;margin-bottom:6px">📷</div>
       <div style="font-size:13px;color:var(--t3)">拍照或上傳收據（自動辨識）</div>
       <img class="rprev" id="rprev">
