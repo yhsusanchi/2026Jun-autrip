@@ -137,10 +137,13 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .etlbl{font-size:12px;opacity:.8}
 .etaud{font-family:'Playfair Display',serif;font-size:36px;font-weight:700}
 .ettwd{font-size:14px;opacity:.8}
-.ei{background:var(--surface);border-radius:var(--rs);padding:12px;margin:8px 16px 0;display:flex;gap:12px;align-items:flex-start;box-shadow:0 1px 6px rgba(100,60,30,.06)}
+.ei{background:var(--surface);border-radius:var(--rs);padding:12px;margin:8px 16px 0;display:flex;gap:12px;align-items:flex-start;box-shadow:0 1px 6px rgba(100,60,30,.06);cursor:pointer}
 .eico{width:36px;height:36px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .einf{flex:1}
 .emch{font-size:13px;font-weight:600}
+.rmphoto{font-size:10.5px;color:var(--danger);margin-top:4px;cursor:pointer;display:none}
+.eicon{font-size:13px;color:var(--t3);flex-shrink:0;padding:2px 0 0 4px}
+.ecur{font-size:9.5px;font-weight:700;color:var(--t3);background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:0 4px;margin-left:4px;vertical-align:1px}
 .ecat{font-size:11px;color:var(--t3)}
 .enot{font-size:11px;color:var(--t3);font-style:italic;margin-top:2px}
 .ert{text-align:right}
@@ -363,24 +366,29 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 <div class="overlay" id="exp-modal">
   <div class="modal">
     <div class="mhandle"></div>
-    <div class="mtitle">新增消費</div>
+    <div class="mtitle" id="expmt">新增消費</div>
     <div class="rupload" id="rup">
       <input type="file" id="rfile" accept="image/*" onchange="handleOCR(event)">
       <div style="font-size:28px;margin-bottom:6px">📷</div>
       <div style="font-size:13px;color:var(--t3)">拍照或上傳收據（自動辨識）</div>
       <img class="rprev" id="rprev">
     </div>
+    <div class="rmphoto" id="rmphoto" onclick="removePendingImg()">🗑 移除照片</div>
     <div class="ocr" id="ocrr"></div>
     <div id="ocrl" style="display:none;text-align:center;padding:8px;font-size:12px;color:var(--t3)">🤖 辨識中...</div>
     <div class="frow">
       <div class="fg">
-        <label class="fl">金額 AUD *</label>
+        <label class="fl">金額 *</label>
         <input class="fi" type="number" id="eamt" placeholder="0.00" step="0.01">
       </div>
       <div class="fg">
         <label class="fl">日期</label>
         <input class="fi" type="date" id="edate">
       </div>
+    </div>
+    <div class="fg">
+      <label class="fl">幣別</label>
+      <div class="chips" id="curc"></div>
     </div>
     <div class="fg">
       <label class="fl">商家／說明 *</label>
@@ -724,7 +732,14 @@ days:[
 ]};
 
 // ═══════════ STATE ═══════════
-let curDay=0, selCat='food', editDayI=-1, editActI=-1;
+let curDay=0, selCat='food', editDayI=-1, editActI=-1, editIdx=-1, selCur='AUD';
+const RATE_AUD_TWD=21, RATE_SGD_TWD=24, RATE_AUD_SGD=0.88;
+function toAUD(amt,cur){
+  if(!cur||cur==='AUD')return amt;
+  if(cur==='TWD')return amt/RATE_AUD_TWD;
+  if(cur==='SGD')return amt/RATE_AUD_SGD;
+  return amt;
+}
 const LS=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch{return f}};
 const SS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 let exps=LS('aus_exp',[]);
@@ -948,9 +963,9 @@ function addPack(){const t=prompt('新增項目：');if(t&&t.trim()){packs.push(
 
 // ═══════════ EXPENSES ═══════════
 function renderExp(){
-  const tot=exps.reduce((s,e)=>s+e.amt,0);
+  const tot=exps.reduce((s,e)=>s+toAUD(e.amt,e.cur),0);
   document.getElementById('etaud').textContent=`AUD ${tot.toFixed(2)}`;
-  document.getElementById('ettwd').textContent=`≈ TWD ${Math.round(tot*21).toLocaleString()}`;
+  document.getElementById('ettwd').textContent=`≈ TWD ${Math.round(tot*RATE_AUD_TWD).toLocaleString()}`;
   document.getElementById('ecnt').textContent=`${exps.length} 筆`;
   document.getElementById('apib').style.display=apiKey?'none':'flex';
   const list=document.getElementById('elist');
@@ -958,48 +973,67 @@ function renderExp(){
   list.innerHTML=[...exps].reverse().map((e,ri)=>{
     const i=exps.length-1-ri;
     const cat=CATS.find(c=>c.id===e.cat)||CATS[6];
+    const cur=e.cur||'AUD';
     const photoH=e.img
-      ? `<img class="ethumb" src="${e.img}" onclick="openLightbox('${e.img}')">`
+      ? `<img class="ethumb" src="${e.img}" onclick="event.stopPropagation();openLightbox('${e.img}')">`
       : `<div class="eico">${cat.e}</div>`;
-    return`<div class="ei">
+    return`<div class="ei" onclick="openExpMd(${i})">
       ${photoH}
       <div class="einf">
-        <div class="emch">${e.mch}</div>
+        <div class="emch">${e.mch} <span class="eicon">✏️</span></div>
         <div class="ecat">${cat.e} ${cat.l} · ${e.dt}</div>
         ${e.no?`<div class="enot">📝 ${e.no}</div>`:''}
-        ${e.img?'':`<button class="ephotobtn" onclick="triggerAttach(${i})">📷 上傳照片/收據</button>`}
+        ${e.img?'':`<button class="ephotobtn" onclick="event.stopPropagation();triggerAttach(${i})">📷 上傳照片/收據</button>`}
       </div>
       <div class="ert">
-        <div class="eamt">$${e.amt.toFixed(2)}</div>
-        <div class="edel" onclick="delExp(${i})">刪除</div>
+        <div class="eamt">$${e.amt.toFixed(2)}<span class="ecur">${cur}</span></div>
+        <div class="edel" onclick="event.stopPropagation();delExp(${i})">刪除</div>
       </div>
     </div>`;
   }).join('');
 }
-function openExpMd(){
-  document.getElementById('eamt').value='';
-  document.getElementById('emch').value='';
-  document.getElementById('enot').value='';
-  document.getElementById('edate').value=new Date().toISOString().split('T')[0];
-  document.getElementById('rprev').style.display='none';
+function openExpMd(idx=-1){
+  editIdx=idx;
+  const e=idx>=0?exps[idx]:null;
+  document.getElementById('expmt').textContent=e?'編輯消費':'新增消費';
+  document.getElementById('eamt').value=e?e.amt:'';
+  document.getElementById('emch').value=e?e.mch:'';
+  document.getElementById('enot').value=e?(e.no||''):'';
+  document.getElementById('edate').value=e?e.dt:new Date().toISOString().split('T')[0];
   document.getElementById('ocrr').style.display='none';
   document.getElementById('ocrl').style.display='none';
   document.getElementById('rfile').value='';
-  selCat='food'; renderCats();
-  pendingImg=null;
+  selCat=e?e.cat:'food'; renderCats();
+  selCur=e?(e.cur||'AUD'):'AUD'; renderCur();
+  pendingImg=e?(e.img||null):null;
+  showPendingPreview();
   openMd('exp-modal');
 }
+function showPendingPreview(){
+  const rprev=document.getElementById('rprev'), rm=document.getElementById('rmphoto');
+  if(pendingImg){rprev.src=pendingImg;rprev.style.display='block';rm.style.display='block';}
+  else{rprev.style.display='none';rprev.src='';rm.style.display='none';}
+}
+function removePendingImg(){pendingImg=null;showPendingPreview();}
 function renderCats(){
   document.getElementById('catc').innerHTML=CATS.map(c=>`<button class="chip ${c.id===selCat?'on':''}" onclick="selC('${c.id}')">${c.e} ${c.l}</button>`).join('');
 }
 function selC(id){selCat=id;renderCats();}
+function renderCur(){
+  document.getElementById('curc').innerHTML=['AUD','TWD','SGD'].map(c=>`<button class="chip ${c===selCur?'on':''}" onclick="selCurFn('${c}')">${c}</button>`).join('');
+}
+function selCurFn(c){selCur=c;renderCur();}
 function saveExp(){
   const amt=parseFloat(document.getElementById('eamt').value);
   const mch=document.getElementById('emch').value.trim();
   if(!amt||!mch){alert('請填寫金額與商家名稱');return;}
-  const e={id:Date.now(),amt,mch,cat:selCat,dt:document.getElementById('edate').value,no:document.getElementById('enot').value.trim()};
-  if(pendingImg)e.img=pendingImg;
-  exps.push(e);
+  const data={amt,mch,cat:selCat,cur:selCur,dt:document.getElementById('edate').value,no:document.getElementById('enot').value.trim()};
+  if(pendingImg)data.img=pendingImg;
+  if(editIdx>=0){
+    exps[editIdx]={...exps[editIdx],...data,img:pendingImg||undefined};
+  }else{
+    exps.push({id:Date.now(),...data});
+  }
   SS('aus_exp',exps); closeMd('exp-modal'); renderExp();
 }
 function delExp(i){if(!confirm(`刪除「${exps[i].mch}」？`))return;exps.splice(i,1);SS('aus_exp',exps);renderExp();}
@@ -1052,6 +1086,7 @@ async function handleOCR(ev){
     const url=e.target.result;
     const prev=document.getElementById('rprev');
     prev.src=url; prev.style.display='block';
+    document.getElementById('rmphoto').style.display='block';
     if(!apiKey){
       const r=document.getElementById('ocrr');
       r.style.display='block'; r.textContent='⚠️ 請先設定 OpenAI API Key';return;
