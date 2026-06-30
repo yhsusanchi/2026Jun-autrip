@@ -74,6 +74,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .tnotes{font-size:11px;color:var(--t3);margin-top:4px;line-height:1.4}
 .elay{position:absolute;top:8px;right:8px;font-size:13px;opacity:0;transition:opacity .2s}
 .tc:hover .elay{opacity:1}
+/* Meal options dropdown */
+.mealopts{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.mopt{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--bdr);border-radius:10px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.mopt:hover{border-color:var(--acc)}
+.mopt.on{border-color:var(--pri);background:#FBF1E6}
+.moradio{width:15px;height:15px;border-radius:50%;border:2px solid var(--bdr);flex-shrink:0;position:relative}
+.mopt.on .moradio{border-color:var(--pri)}
+.mopt.on .moradio::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--pri)}
+.moinfo{flex:1;min-width:0}
+.moname{font-size:12.5px;font-weight:600;color:var(--txt);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.motag{font-size:9px;font-weight:600;background:var(--acc);color:#fff;padding:1px 6px;border-radius:8px}
+.mocuisine{font-size:10.5px;color:var(--t3);margin-top:1px}
+.morate{font-size:10.5px;color:var(--t2);white-space:nowrap;flex-shrink:0}
+.momap{font-size:16px;text-decoration:none;flex-shrink:0;padding:2px 4px}
+.mealhint{font-size:10.5px;color:var(--t3);margin-top:2px;display:flex;align-items:center;gap:4px}
 .addact{display:flex;align-items:center;gap:6px;color:var(--acc);font-size:12px;font-weight:600;cursor:pointer;padding:10px 16px;border:none;background:none;font-family:inherit}
 /* Cost */
 .csum{background:var(--s2);border-radius:var(--rs);padding:12px;margin:10px 16px 0}
@@ -131,6 +146,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .ert{text-align:right}
 .eamt{font-size:15px;font-weight:700;color:var(--pri)}
 .edel{font-size:11px;color:var(--danger);cursor:pointer;margin-top:4px}
+.ethumb{width:36px;height:36px;border-radius:8px;object-fit:cover;cursor:pointer;flex-shrink:0;border:1px solid var(--bdr)}
+.ephotobtn{font-size:10.5px;color:var(--acc);cursor:pointer;margin-top:4px;font-weight:600;background:none;border:none;font-family:inherit;padding:0}
+.ephotoin{display:none}
+.lbox{display:none;position:fixed;inset:0;background:rgba(20,12,8,.85);z-index:300;align-items:center;justify-content:center;padding:24px}
+.lbox.on{display:flex}
+.lbox img{max-width:100%;max-height:100%;border-radius:12px}
 .apib{background:#FFF9F0;border:1px solid #E8D5B0;border-radius:var(--rs);padding:12px;margin:8px 16px 0;display:flex;gap:10px;align-items:center}
 .apibt{font-size:12px;color:var(--t2);flex:1}
 .apisb{font-size:12px;color:var(--pri);font-weight:700;cursor:pointer;border:none;background:none;font-family:inherit;white-space:nowrap}
@@ -334,6 +355,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
   </nav>
 </div>
 
+<div class="lbox" id="lbox" onclick="this.classList.remove('on')"><img id="lboximg" src=""></div>
+<input type="file" id="attachFile" accept="image/*" capture="environment" class="ephotoin" onchange="handleAttachPhoto(event)">
+
 <button class="fab" id="fab" onclick="openExpMd()">＋</button>
 
 <!-- Expense Modal -->
@@ -429,7 +453,11 @@ days:[
     {tm:"13:00",ac:"抵達 Eating 媽媽家・整理行李休息",tp:"rest",mp:"https://www.google.com/maps/search/?api=1&query=285+City+Rd+Southbank+VIC+3006"},
     {tm:"15:30",ac:"Southbank 河濱散步・認識周邊",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Southbank+Promenade+Melbourne"},
     {tm:"17:00",ac:"Coles 超市採買生活用品",tp:"shopping",cost:30,mp:"https://www.google.com/maps/search/?api=1&query=Coles+Southbank+Melbourne"},
-    {tm:"19:00",ac:"晚餐",tp:"meal"}
+    {tm:"19:00",ac:"晚餐",tp:"meal",opts:[
+      {n:"48hr Pizza & Burger Bar",c:"Southbank・披薩漢堡",rt:4.4,rv:1800,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=48hr+Pizza+Burger+Bar+Southbank+Melbourne"},
+      {n:"Hophaus Southbank",c:"Southbank・德式啤酒餐廳",rt:4.3,rv:3200,mp:"https://www.google.com/maps/search/?api=1&query=Hophaus+Bier+Bar+Southbank+Melbourne"},
+      {n:"Boatbuilders Yard",c:"Southbank・河岸酒吧餐廳",rt:4.2,rv:900,mp:"https://www.google.com/maps/search/?api=1&query=Boatbuilders+Yard+Southbank+Melbourne"}
+    ]}
    ],cost:{a:130,t:2730}},
   {date:"2026-06-26",wd:"週五",theme:"自由日・St. Ali Café・市區漫步",city:"Melbourne",cp:["Ping","Eating","小白"],
    wx:{t:"8-14°C",c:"外套＋毛衣＋舒適步行鞋"},
@@ -439,7 +467,11 @@ days:[
     {tm:"12:30",ac:"South Melbourne Market 逛逛",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=South+Melbourne+Market"},
     {tm:"14:00",ac:"CBD 漫步：Hosier Lane・Fed Square・Flinders St",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Hosier+Lane+Melbourne"},
     {tm:"17:00",ac:"返回住宿休息",tp:"rest"},
-    {tm:"19:00",ac:"晚餐",tp:"meal"}
+    {tm:"19:00",ac:"晚餐",tp:"meal",opts:[
+      {n:"Butchers Diner",c:"CBD・牛排漢堡",rt:4.5,rv:2100,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=Butchers+Diner+Melbourne+CBD"},
+      {n:"Chin Chin",c:"CBD・亞洲創意料理",rt:4.4,rv:5600,mp:"https://www.google.com/maps/search/?api=1&query=Chin+Chin+Melbourne"},
+      {n:"MoVida",c:"CBD・西班牙Tapas",rt:4.5,rv:3400,mp:"https://www.google.com/maps/search/?api=1&query=MoVida+Melbourne"}
+    ]}
    ],cost:{a:48,t:1008}},
   {date:"2026-06-27",wd:"週六",theme:"Mornington 半島一日遊",city:"Mornington Peninsula",cp:["Ping","Eating","小白"],
    wx:{t:"7-13°C",c:"防風外套＋厚毛衣＋防水鞋＋帽子"},
@@ -447,11 +479,19 @@ days:[
     {tm:"09:00",ac:"出發 Mornington Peninsula（Eating 媽媽開車，約 1.5hr）",tp:"transport"},
     {tm:"10:30",ac:"Mornington 小鎮 Main Street 逛逛",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Mornington+Main+Street+Victoria"},
     {tm:"11:30",ac:"Arthurs Seat 鷹眼纜車（可選，AUD 25/人）",tp:"sightseeing",cost:25,mp:"https://www.google.com/maps/search/?api=1&query=Arthurs+Seat+Eagle+Mornington+Peninsula"},
-    {tm:"13:00",ac:"午餐（Mornington 小鎮）",tp:"meal"},
+    {tm:"13:00",ac:"午餐（Mornington 小鎮）",tp:"meal",opts:[
+      {n:"Mornington Peninsula Brewery",c:"Mornington・精釀啤酒餐館",rt:4.4,rv:2200,mp:"https://www.google.com/maps/search/?api=1&query=Mornington+Peninsula+Brewery"},
+      {n:"Drift House Mornington",c:"Mornington・海景餐廳",rt:4.3,rv:1100,mp:"https://www.google.com/maps/search/?api=1&query=Drift+House+Mornington"},
+      {n:"Hooked Mornington",c:"Mornington・海鮮料理",rt:4.4,rv:800,mp:"https://www.google.com/maps/search/?api=1&query=Hooked+Mornington+Peninsula"}
+    ]},
     {tm:"14:30",ac:"Cape Schanck 燈塔或海岸線散步",tp:"nature",mp:"https://www.google.com/maps/search/?api=1&query=Cape+Schanck+Lighthouse+Victoria"},
     {tm:"16:30",ac:"Red Hill 酒莊區兜風",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Red+Hill+Winery+Mornington+Peninsula"},
     {tm:"18:00",ac:"驅車返回 Southbank（約 1.5hr）",tp:"transport"},
-    {tm:"19:30",ac:"晚餐",tp:"meal"}
+    {tm:"19:30",ac:"晚餐",tp:"meal",opts:[
+      {n:"Hawker Hall",c:"CBD・亞洲熟食街風",rt:4.3,rv:2500,mp:"https://www.google.com/maps/search/?api=1&query=Hawker+Hall+Melbourne"},
+      {n:"Riverland Bar",c:"Southbank・河岸酒吧",rt:4.2,rv:1600,mp:"https://www.google.com/maps/search/?api=1&query=Riverland+Bar+Melbourne"},
+      {n:"Piccolina Gelateria",c:"CBD・義式冰淇淋(飯後甜點)",rt:4.6,rv:950,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=Piccolina+Gelateria+Melbourne"}
+    ]}
    ],cost:{a:65,t:1365}},
   {date:"2026-06-28",wd:"週日",theme:"Rose St. Market + QV Market",city:"Melbourne",cp:["Ping","Eating","小白"],
    wx:{t:"8-14°C",c:"外套＋舒適步行鞋"},
@@ -466,11 +506,19 @@ days:[
    wx:{t:"7-13°C",c:"外套＋舒適步行鞋"},
    sch:[
     {tm:"晚起",ac:"睡到自然醒，輕鬆早午餐",tp:"rest"},
-    {tm:"11:00",ac:"早午餐",tp:"meal"},
+    {tm:"11:00",ac:"早午餐",tp:"meal",opts:[
+      {n:"Common Galaxia",c:"South Wharf・早午餐",rt:4.3,rv:1200,mp:"https://www.google.com/maps/search/?api=1&query=Common+Galaxia+South+Wharf+Melbourne"},
+      {n:"Lucas Restaurant South Wharf",c:"South Wharf・義式料理",rt:4.3,rv:900,mp:"https://www.google.com/maps/search/?api=1&query=Lucas+Restaurant+South+Wharf+Melbourne"},
+      {n:"South Wharf Hotel Bistro",c:"South Wharf・酒吧餐酒",rt:4.1,rv:700,mp:"https://www.google.com/maps/search/?api=1&query=South+Wharf+Hotel+Melbourne"}
+    ]},
     {tm:"13:00",ac:"DFO South Wharf Outlet 採購（步行可達）",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=DFO+South+Wharf+Melbourne",no:"Aesop、運動品牌、澳洲本地品牌"},
     {tm:"16:30",ac:"Aesop South Wharf 選購",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=Aesop+South+Wharf+Melbourne"},
     {tm:"18:00",ac:"返回住宿休息",tp:"rest"},
-    {tm:"19:30",ac:"晚餐",tp:"meal"}
+    {tm:"19:30",ac:"晚餐",tp:"meal",opts:[
+      {n:"48hr Pizza & Burger Bar",c:"Southbank・披薩漢堡",rt:4.4,rv:1800,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=48hr+Pizza+Burger+Bar+Southbank+Melbourne"},
+      {n:"MoVida",c:"CBD・西班牙Tapas",rt:4.5,rv:3400,mp:"https://www.google.com/maps/search/?api=1&query=MoVida+Melbourne"},
+      {n:"Boatbuilders Yard",c:"Southbank・河岸酒吧餐廳",rt:4.2,rv:900,mp:"https://www.google.com/maps/search/?api=1&query=Boatbuilders+Yard+Southbank+Melbourne"}
+    ]}
    ],cost:{a:190,t:3990}},
   {date:"2026-06-30",wd:"週二",theme:"大洋路 Great Ocean Road",city:"Great Ocean Road",cp:["Ping","Eating","小白"],
    wx:{t:"6-13°C",c:"防風防水外套＋厚毛衣＋防水鞋＋帽子"},
@@ -483,29 +531,45 @@ days:[
     {tm:"16:00",ac:"🪨 十二門徒石 12 Apostles",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Twelve+Apostles+Great+Ocean+Road",no:"免費入場，日落前景色最美"},
     {tm:"17:30",ac:"Loch Ard Gorge（若時間允許）",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Loch+Ard+Gorge+Victoria"},
     {tm:"18:00",ac:"驅車返回 Southbank（約 3hr）",tp:"transport"}
-   ],cost:{a:45,t:945,no:"包車費 Eating 媽媽安排"}},
+   ],cost:{a:45,t:945,no:"包車已訂好"}},
   {date:"2026-07-01",wd:"週三",theme:"St Kilda Beach 海灘漫遊",city:"Melbourne",cp:["Ping","Eating","小白"],
    wx:{t:"8-14°C",c:"外套＋舒適步行鞋"},
    sch:[
     {tm:"10:00",ac:"電車前往 St Kilda（Route 96）",tp:"transport"},
     {tm:"10:30",ac:"St Kilda Beach 海灘散步",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=St+Kilda+Beach+Melbourne"},
     {tm:"11:30",ac:"St Kilda Pier + 遠眺 Melbourne Skyline",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=St+Kilda+Pier+Melbourne"},
-    {tm:"12:30",ac:"午餐",tp:"meal"},
+    {tm:"12:30",ac:"午餐",tp:"meal",opts:[
+      {n:"Stokehouse St Kilda",c:"St Kilda・海景餐廳",rt:4.3,rv:1500,mp:"https://www.google.com/maps/search/?api=1&query=Stokehouse+St+Kilda"},
+      {n:"Republica St Kilda",c:"St Kilda・地中海料理",rt:4.2,rv:1100,mp:"https://www.google.com/maps/search/?api=1&query=Republica+St+Kilda"},
+      {n:"Galleon Café",c:"St Kilda・咖啡早午餐",rt:4.4,rv:1700,mp:"https://www.google.com/maps/search/?api=1&query=Galleon+Cafe+St+Kilda"}
+    ]},
     {tm:"14:00",ac:"Acland Street 蛋糕店 + 閒逛",tp:"cafe",cost:12,mp:"https://www.google.com/maps/search/?api=1&query=Acland+Street+St+Kilda+Melbourne"},
     {tm:"15:00",ac:"Luna Park 外觀打卡（免費）",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Luna+Park+St+Kilda+Melbourne"},
     {tm:"16:30",ac:"返回 Southbank",tp:"transport"},
-    {tm:"19:00",ac:"晚餐",tp:"meal"}
+    {tm:"19:00",ac:"晚餐",tp:"meal",opts:[
+      {n:"Butchers Diner",c:"CBD・牛排漢堡",rt:4.5,rv:2100,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=Butchers+Diner+Melbourne+CBD"},
+      {n:"Hophaus Southbank",c:"Southbank・德式啤酒餐廳",rt:4.3,rv:3200,mp:"https://www.google.com/maps/search/?api=1&query=Hophaus+Bier+Bar+Southbank+Melbourne"},
+      {n:"Chin Chin",c:"CBD・亞洲創意料理",rt:4.4,rv:5600,mp:"https://www.google.com/maps/search/?api=1&query=Chin+Chin+Melbourne"}
+    ]}
    ],cost:{a:70,t:1470}},
   {date:"2026-07-02",wd:"週四",theme:"NGV 美術館 + 墨爾本最後巡禮",city:"Melbourne",cp:["Ping","Eating","小白"],
    wx:{t:"8-14°C",c:"外套＋毛衣＋舒適步行鞋"},
    sch:[
     {tm:"09:30",ac:"Good Measure Coffee（與 Ping）",tp:"cafe",cost:8,mp:"https://www.google.com/maps/search/?api=1&query=Good+Measure+Melbourne"},
     {tm:"10:30",ac:"NGV International 維多利亞國家美術館",tp:"art",mp:"https://www.google.com/maps/search/?api=1&query=NGV+International+Melbourne",no:"常設展免費，特展另計約 AUD 25"},
-    {tm:"13:00",ac:"午餐（NGV 附近）",tp:"meal"},
+    {tm:"13:00",ac:"午餐（NGV 附近）",tp:"meal",opts:[
+      {n:"NGV Garden Restaurant",c:"NGV・美術館花園餐廳",rt:4.2,rv:600,mp:"https://www.google.com/maps/search/?api=1&query=NGV+Garden+Restaurant+Melbourne"},
+      {n:"Riverland Bar",c:"Southbank・河岸酒吧",rt:4.2,rv:1600,mp:"https://www.google.com/maps/search/?api=1&query=Riverland+Bar+Melbourne"},
+      {n:"Hopetoun Tea Rooms",c:"CBD・百年下午茶名店",rt:4.4,rv:2800,mp:"https://www.google.com/maps/search/?api=1&query=Hopetoun+Tea+Rooms+Melbourne"}
+    ]},
     {tm:"14:30",ac:"Aesop Melbourne CBD（若未購）",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=Aesop+Melbourne+CBD"},
     {tm:"15:30",ac:"墨爾本市區最後採購",tp:"leisure"},
     {tm:"17:00",ac:"返回住宿打包行李",tp:"rest",no:"明晚 20:45 飛雪梨，行李 ≤ 23kg"},
-    {tm:"19:00",ac:"墨爾本最後一頓晚餐",tp:"meal"}
+    {tm:"19:00",ac:"墨爾本最後一頓晚餐",tp:"meal",opts:[
+      {n:"Butchers Diner",c:"CBD・牛排漢堡",rt:4.5,rv:2100,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=Butchers+Diner+Melbourne+CBD"},
+      {n:"MoVida",c:"CBD・西班牙Tapas",rt:4.5,rv:3400,mp:"https://www.google.com/maps/search/?api=1&query=MoVida+Melbourne"},
+      {n:"Piccolina Gelateria",c:"CBD・義式冰淇淋(飯後甜點)",rt:4.6,rv:950,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=Piccolina+Gelateria+Melbourne"}
+    ]}
    ],cost:{a:115,t:2415}},
   {date:"2026-07-03",wd:"週五",theme:"墨爾本最後半天・傍晚飛雪梨",city:"Melbourne → Sydney",cp:["Ping"],
    wx:{t:"MEL 8°C / SYD 18°C",c:"薄外套，Sydney 稍暖"},
@@ -513,7 +577,11 @@ days:[
     {tm:"09:00",ac:"早餐 + 最後行李確認（≤ 23kg）",tp:"rest"},
     {tm:"10:30",ac:"Good Measure Coffee（最後一杯）",tp:"cafe",cost:8,mp:"https://www.google.com/maps/search/?api=1&query=Good+Measure+Melbourne"},
     {tm:"11:30",ac:"CBD 最後散步",tp:"leisure"},
-    {tm:"13:00",ac:"午餐（墨爾本最後一餐）",tp:"meal"},
+    {tm:"13:00",ac:"午餐（墨爾本最後一餐）",tp:"meal",opts:[
+      {n:"48hr Pizza & Burger Bar",c:"Southbank・披薩漢堡",rt:4.4,rv:1800,tag:"朋友推薦",mp:"https://www.google.com/maps/search/?api=1&query=48hr+Pizza+Burger+Bar+Southbank+Melbourne"},
+      {n:"Chin Chin",c:"CBD・亞洲創意料理",rt:4.4,rv:5600,mp:"https://www.google.com/maps/search/?api=1&query=Chin+Chin+Melbourne"},
+      {n:"Hophaus Southbank",c:"Southbank・德式啤酒餐廳",rt:4.3,rv:3200,mp:"https://www.google.com/maps/search/?api=1&query=Hophaus+Bier+Bar+Southbank+Melbourne"}
+    ]},
     {tm:"16:00",ac:"取行李・道別 Eating 一家",tp:"rest"},
     {tm:"17:30",ac:"Uber 前往 Melbourne Airport T3（約 35min）",tp:"transport",cost:60,no:"⚠️ VA897 在 T3，建議 17:30 出門"},
     {tm:"20:45",ac:"✈️ VA897 MEL T3 → SYD T2（1hr25min）",tp:"transport",no:"Boeing 737-800 · 座位 16A"},
@@ -534,11 +602,19 @@ days:[
    sch:[
     {tm:"09:00",ac:"出發前往 Hunter Valley（Claire 開車，約 2hr）",tp:"transport"},
     {tm:"11:00",ac:"Brokenwood Wines 酒莊試飲",tp:"leisure",cost:15,mp:"https://www.google.com/maps/search/?api=1&query=Brokenwood+Wines+Hunter+Valley"},
-    {tm:"13:00",ac:"午餐（酒莊附近）",tp:"meal"},
+    {tm:"13:00",ac:"午餐（酒莊附近）",tp:"meal",opts:[
+      {n:"Hunter Valley Chocolate Company",c:"Pokolbin・巧克力咖啡輕食",rt:4.3,rv:1300,mp:"https://www.google.com/maps/search/?api=1&query=Hunter+Valley+Chocolate+Company"},
+      {n:"Cafe Enzo",c:"Pokolbin・義式餐廳",rt:4.2,rv:900,mp:"https://www.google.com/maps/search/?api=1&query=Cafe+Enzo+Hunter+Valley"},
+      {n:"Hunter Valley Smokehouse",c:"Pokolbin・煙燻燒烤",rt:4.4,rv:700,mp:"https://www.google.com/maps/search/?api=1&query=Hunter+Valley+Smokehouse"}
+    ]},
     {tm:"14:30",ac:"Tyrrell's Wines 試飲",tp:"leisure",cost:10,mp:"https://www.google.com/maps/search/?api=1&query=Tyrrells+Wines+Hunter+Valley"},
     {tm:"16:00",ac:"Pokolbin Village 小鎮漫步 / 起司店",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Hunter+Valley+Wine+Country+Village"},
     {tm:"18:00",ac:"Check-in 住宿（Claire 已預訂）",tp:"rest"},
-    {tm:"19:30",ac:"晚餐",tp:"meal"}
+    {tm:"19:30",ac:"晚餐",tp:"meal",opts:[
+      {n:"Esca Bimbadgen",c:"Pokolbin・酒莊景觀餐廳",rt:4.5,rv:600,mp:"https://www.google.com/maps/search/?api=1&query=Esca+Bimbadgen+Hunter+Valley"},
+      {n:"Catherine's Restaurant",c:"Pokolbin・家庭式餐廳",rt:4.2,rv:800,mp:"https://www.google.com/maps/search/?api=1&query=Catherines+Restaurant+Hunter+Valley"},
+      {n:"Hunter Valley Gardens Grill",c:"Pokolbin・燒烤牛排",rt:4.1,rv:500,mp:"https://www.google.com/maps/search/?api=1&query=Hunter+Valley+Gardens+Grill"}
+    ]}
    ],cost:{a:115,t:2415,no:"住宿由 Claire 安排"}},
   {date:"2026-07-06",wd:"週一",theme:"Hunter Valley Day 2・返回雪梨",city:"Hunter Valley → Sydney",cp:["Ping","Claire"],
    wx:{t:"6-17°C",c:"厚外套"},
@@ -547,7 +623,11 @@ days:[
     {tm:"10:00",ac:"Hunter Valley Gardens（可選，AUD 15）",tp:"leisure",cost:15,mp:"https://www.google.com/maps/search/?api=1&query=Hunter+Valley+Gardens"},
     {tm:"11:30",ac:"驅車返回 Baulkham Hills（約 2hr）",tp:"transport"},
     {tm:"14:00",ac:"抵達 Claire 家・午餐 + 休息",tp:"rest"},
-    {tm:"19:00",ac:"晚餐",tp:"meal"}
+    {tm:"19:00",ac:"晚餐",tp:"meal",opts:[
+      {n:"The Norfolk Hotel",c:"Baulkham Hills・酒吧餐館",rt:4.2,rv:1400,mp:"https://www.google.com/maps/search/?api=1&query=The+Norfolk+Hotel+Baulkham+Hills"},
+      {n:"Guzman y Gomez Castle Hill",c:"Castle Hill・墨西哥快餐",rt:4.3,rv:1100,mp:"https://www.google.com/maps/search/?api=1&query=Guzman+y+Gomez+Castle+Hill"},
+      {n:"Crowne Plaza Norwest Bistro",c:"Norwest・自助餐廳",rt:4.0,rv:600,mp:"https://www.google.com/maps/search/?api=1&query=Crowne+Plaza+Norwest+Bistro"}
+    ]}
    ],cost:{a:65,t:1365}},
   {date:"2026-07-07",wd:"週二",theme:"Taronga Zoo 動物園",city:"Sydney - Mosman",cp:["Ping"],
    wx:{t:"10-18°C",c:"薄外套＋舒適步行鞋"},
@@ -555,17 +635,29 @@ days:[
     {tm:"09:00",ac:"前往 Circular Quay 搭渡輪（Wharf 2）",tp:"transport",mp:"https://www.google.com/maps/search/?api=1&query=Circular+Quay+Ferry+Wharf+Sydney"},
     {tm:"10:00",ac:"🚢 渡輪至 Taronga Zoo Wharf（約 12min，景色絕美）",tp:"transport",no:"Opal Card 搭乘，單程約 AUD 4"},
     {tm:"10:15",ac:"🦁 Taronga Zoo 全天遊覽",tp:"attraction",cost:47,mp:"https://www.google.com/maps/search/?api=1&query=Taronga+Zoo+Sydney",no:"必看：無尾熊、袋鼠、袋熊 · 可俯瞰雪梨港灣"},
-    {tm:"13:00",ac:"園內午餐",tp:"meal",cost:20},
+    {tm:"13:00",ac:"園內午餐",tp:"meal",cost:20,opts:[
+      {n:"Taronga Zoo Cafe",c:"Taronga 動物園內・自助輕食",rt:4.0,rv:1900,mp:"https://www.google.com/maps/search/?api=1&query=Taronga+Zoo+Cafe+Sydney"},
+      {n:"The Public House Mosman",c:"Mosman・酒吧餐館",rt:4.3,rv:1200,mp:"https://www.google.com/maps/search/?api=1&query=The+Public+House+Mosman"},
+      {n:"Mosman Rowers Club",c:"Mosman・港景餐廳",rt:4.2,rv:800,mp:"https://www.google.com/maps/search/?api=1&query=Mosman+Rowers+Club"}
+    ]},
     {tm:"15:30",ac:"渡輪返回 Circular Quay",tp:"transport"},
     {tm:"17:00",ac:"返回 Baulkham Hills",tp:"transport"},
-    {tm:"19:00",ac:"晚餐",tp:"meal"}
+    {tm:"19:00",ac:"晚餐",tp:"meal",opts:[
+      {n:"The Norfolk Hotel",c:"Baulkham Hills・酒吧餐館",rt:4.2,rv:1400,mp:"https://www.google.com/maps/search/?api=1&query=The+Norfolk+Hotel+Baulkham+Hills"},
+      {n:"Bourke Street Bakery Castle Hill",c:"Castle Hill・烘焙輕食",rt:4.4,rv:900,mp:"https://www.google.com/maps/search/?api=1&query=Bourke+Street+Bakery+Castle+Hill"},
+      {n:"Eric's Hannah's Kitchen",c:"Baulkham Hills・家庭式料理",rt:4.1,rv:500,mp:"https://www.google.com/maps/search/?api=1&query=Eric's+Hannah's+Kitchen+Baulkham+Hills"}
+    ]}
    ],cost:{a:122,t:2562}},
   {date:"2026-07-08",wd:"週三",theme:"Bondi Beach",city:"Sydney - Bondi",cp:["Ping"],
    wx:{t:"10-18°C",c:"薄外套＋帽子（海邊風大）"},
    sch:[
     {tm:"10:00",ac:"Bondi Beach 海灘漫步",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Bondi+Beach+Sydney"},
     {tm:"11:00",ac:"Bondi Icebergs Pool 外觀打卡",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Bondi+Icebergs+Pool+Sydney"},
-    {tm:"12:30",ac:"午餐（Bondi 周邊）",tp:"meal"},
+    {tm:"12:30",ac:"午餐（Bondi 周邊）",tp:"meal",opts:[
+      {n:"North Bondi Fish",c:"Bondi・海鮮餐廳",rt:4.4,rv:1600,mp:"https://www.google.com/maps/search/?api=1&query=North+Bondi+Fish"},
+      {n:"Speedo's Cafe",c:"Bondi・海景早午餐",rt:4.3,rv:2400,mp:"https://www.google.com/maps/search/?api=1&query=Speedos+Cafe+Bondi"},
+      {n:"Bondi Beach Public Bar",c:"Bondi・酒吧餐館",rt:4.2,rv:1700,mp:"https://www.google.com/maps/search/?api=1&query=Bondi+Beach+Public+Bar"}
+    ]},
     {tm:"14:00",ac:"Bondi to Coogee 海岸步道（部分段）",tp:"nature",mp:"https://www.google.com/maps/search/?api=1&query=Bondi+to+Coogee+Coastal+Walk",no:"全程 6km，可走至 Clovelly"},
     {tm:"16:00",ac:"返回 Baulkham Hills",tp:"transport"}
    ],cost:{a:75,t:1575}},
@@ -576,7 +668,11 @@ days:[
     {tm:"10:30",ac:"🎭 雪梨歌劇院外觀拍照（免費）",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Sydney+Opera+House",no:"最佳拍照點：Circular Quay 碼頭、Mrs Macquarie's Chair"},
     {tm:"11:30",ac:"Mrs Macquarie's Chair 港灣全景",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Mrs+Macquaries+Chair+Sydney"},
     {tm:"12:30",ac:"Royal Botanic Garden 散步",tp:"nature",mp:"https://www.google.com/maps/search/?api=1&query=Royal+Botanic+Garden+Sydney"},
-    {tm:"13:30",ac:"午餐",tp:"meal"},
+    {tm:"13:30",ac:"午餐",tp:"meal",opts:[
+      {n:"Opera Bar",c:"Circular Quay・歌劇院景觀酒吧",rt:4.3,rv:6800,mp:"https://www.google.com/maps/search/?api=1&query=Opera+Bar+Sydney"},
+      {n:"Sydney Cove Oyster Bar",c:"Circular Quay・生蠔海鮮",rt:4.4,rv:2100,mp:"https://www.google.com/maps/search/?api=1&query=Sydney+Cove+Oyster+Bar"},
+      {n:"Sydney Madang",c:"CBD・韓式料理",rt:4.4,rv:1400,mp:"https://www.google.com/maps/search/?api=1&query=Sydney+Madang"}
+    ]},
     {tm:"15:00",ac:"雪梨市區逛逛（QVB / Pitt Street Mall）",tp:"leisure",mp:"https://www.google.com/maps/search/?api=1&query=Queen+Victoria+Building+Sydney"},
     {tm:"17:00",ac:"返回 Baulkham Hills",tp:"transport"}
    ],cost:{a:70,t:1470}},
@@ -586,7 +682,11 @@ days:[
     {tm:"08:00",ac:"出發前往藍山（Claire 開車，約 1.5-2hr）",tp:"transport"},
     {tm:"10:00",ac:"Echo Point 回音角・三姊妹岩 Three Sisters",tp:"sightseeing",mp:"https://www.google.com/maps/search/?api=1&query=Echo+Point+Three+Sisters+Katoomba"},
     {tm:"11:00",ac:"🚡 Scenic World All-Ride Pass",tp:"attraction",cost:45,mp:"https://www.google.com/maps/search/?api=1&query=Scenic+World+Katoomba+NSW",no:"⚠️ 建議線上預訂 | 纜車下→最陡鐵路上→空中步道"},
-    {tm:"13:30",ac:"午餐（Leura 或 Katoomba）",tp:"meal"},
+    {tm:"13:30",ac:"午餐（Leura 或 Katoomba）",tp:"meal",opts:[
+      {n:"Leura Garage",c:"Leura・現代澳式料理",rt:4.4,rv:900,mp:"https://www.google.com/maps/search/?api=1&query=Leura+Garage+NSW"},
+      {n:"Caffe Sicilia",c:"Katoomba・義式咖啡輕食",rt:4.3,rv:600,mp:"https://www.google.com/maps/search/?api=1&query=Caffe+Sicilia+Katoomba"},
+      {n:"Solitary Dining Room",c:"Leura・景觀餐廳",rt:4.5,rv:700,mp:"https://www.google.com/maps/search/?api=1&query=Solitary+Dining+Room+Leura"}
+    ]},
     {tm:"15:00",ac:"Leura 小鎮漫步",tp:"leisure",cost:10,mp:"https://www.google.com/maps/search/?api=1&query=Leura+Village+NSW"},
     {tm:"16:30",ac:"返回 Baulkham Hills（約 1.5-2hr）",tp:"transport"}
    ],cost:{a:90,t:1890}},
@@ -595,11 +695,19 @@ days:[
    sch:[
     {tm:"晚起",ac:"睡到自然醒，輕鬆早午餐",tp:"rest"},
     {tm:"11:00",ac:"Sydney CBD 最後採購（Aesop、衝浪用品、伴手禮）",tp:"shopping",mp:"https://www.google.com/maps/search/?api=1&query=Sydney+CBD+shopping"},
-    {tm:"13:00",ac:"午餐",tp:"meal"},
+    {tm:"13:00",ac:"午餐",tp:"meal",opts:[
+      {n:"Mr Wong",c:"CBD・粵式飲茶",rt:4.5,rv:8200,mp:"https://www.google.com/maps/search/?api=1&query=Mr+Wong+Sydney"},
+      {n:"Spice Alley",c:"Chippendale・亞洲街頭小吃",rt:4.4,rv:3100,mp:"https://www.google.com/maps/search/?api=1&query=Spice+Alley+Chippendale"},
+      {n:"Chat Thai",c:"CBD・泰式料理",rt:4.3,rv:2900,mp:"https://www.google.com/maps/search/?api=1&query=Chat+Thai+Sydney+CBD"}
+    ]},
     {tm:"15:00",ac:"自由閒逛或咖啡館",tp:"leisure"},
     {tm:"17:00",ac:"返回 Claire 家",tp:"rest"},
     {tm:"18:00",ac:"打包行李（明早 07:30 出發）",tp:"rest",no:"確認行李 ≤ 25kg · 準備新加坡出境背包"},
-    {tm:"19:00",ac:"澳洲最後一頓晚餐 🥂",tp:"meal"}
+    {tm:"19:00",ac:"澳洲最後一頓晚餐 🥂",tp:"meal",opts:[
+      {n:"Mr Wong",c:"CBD・粵式飲茶",rt:4.5,rv:8200,mp:"https://www.google.com/maps/search/?api=1&query=Mr+Wong+Sydney"},
+      {n:"Saint Peter",c:"Paddington・精緻海鮮料理",rt:4.6,rv:900,mp:"https://www.google.com/maps/search/?api=1&query=Saint+Peter+Paddington+Sydney"},
+      {n:"Quay",c:"Circular Quay・米其林級景觀餐廳",rt:4.6,rv:1300,mp:"https://www.google.com/maps/search/?api=1&query=Quay+Restaurant+Sydney"}
+    ]}
    ],cost:{a:185,t:3885}},
   {date:"2026-07-12",wd:"週日",theme:"SYD 出發・新加坡魚尾獅・返台",city:"Sydney → Singapore → Taipei",cp:["獨自"],
    wx:{t:"SYD 10°C / SIN 30°C",c:"機場薄外套，新加坡很熱"},
@@ -623,7 +731,9 @@ const SS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 let exps=LS('aus_exp',[]);
 let packs=LS('aus_pack',defaultPacks());
 let edits=LS('aus_edits',{});
+let mealSel=LS('aus_meal',{});
 let apiKey=localStorage.getItem('aus_key')||'';
+let pendingImg=null;
 
 function defaultPacks(){return[
   {id:1,t:'護照 + 影本',c:false},{id:2,t:'澳洲 ETA（截圖存手機）',c:false},
@@ -680,6 +790,29 @@ function selDay(i){
 
 function getSch(i){return edits[i]||D.days[i].sch.map(s=>({...s}));}
 
+function renderMealOpts(di,ai,opts){
+  const key=`${di}_${ai}`;
+  const sel=key in mealSel?mealSel[key]:null;
+  const rows=opts.map((o,oi)=>`
+    <div class="mopt ${sel===oi?'on':''}" onclick="event.stopPropagation();selMeal(${di},${ai},${oi})">
+      <div class="moradio"></div>
+      <div class="moinfo">
+        <div class="moname">${o.n}${o.tag?`<span class="motag">${o.tag}</span>`:''}</div>
+        <div class="mocuisine">${o.c}</div>
+      </div>
+      <div class="morate">⭐${o.rt}・${o.rv>=1000?(o.rv/1000).toFixed(1)+'k':o.rv}則</div>
+      <a class="momap" href="${o.mp}" target="_blank" onclick="event.stopPropagation()">📍</a>
+    </div>`).join('');
+  return `<div class="mealhint">🍴 選一家推薦餐廳（${opts.length}選1）</div><div class="mealopts">${rows}</div>`;
+}
+function selMeal(di,ai,oi){
+  const key=`${di}_${ai}`;
+  mealSel[key]=mealSel[key]===oi?null:oi;
+  if(mealSel[key]===null)delete mealSel[key];
+  SS('aus_meal',mealSel);
+  renderDay(di);
+}
+
 function renderDay(i){
   const day=D.days[i];
   const sch=getSch(i);
@@ -691,7 +824,6 @@ function renderDay(i){
     <div class="htheme">${day.theme}</div>
     <div class="hmeta">
       <div class="hbadge">📍 ${day.city}</div>
-      <div class="hbadge">👥 ${day.cp.join('、')}</div>
     </div>
   </div>
   <div class="wcard"><div class="wtemp">${day.wx.t}</div><div class="wcloth">👗 ${day.wx.c}</div></div>
@@ -702,6 +834,7 @@ function renderDay(i){
     const costH=item.cost?`<span class="tcost">AUD ${item.cost}</span>`:'';
     const mapH=item.mp?`<a class="tmap" href="${item.mp}" target="_blank">📍 地圖</a>`:'';
     const notH=item.no?`<div class="tnotes">${item.no}</div>`:'';
+    const mealH=item.opts?renderMealOpts(i,j,item.opts):'';
     h+=`<div class="ti">
       <div class="ttime">${item.tm||''}</div>
       <div class="twrap"><div class="tdot" style="background:${col}"></div>${j<sch.length-1?'<div class="tvline"></div>':''}</div>
@@ -709,6 +842,7 @@ function renderDay(i){
         <div class="tctitle">${item.ac}</div>
         ${costH||mapH?`<div class="tcmeta">${costH}${mapH}</div>`:''}
         ${notH}
+        ${mealH}
         <div class="elay">✏️</div>
       </div>
     </div>`;
@@ -825,12 +959,16 @@ function renderExp(){
   list.innerHTML=[...exps].reverse().map((e,ri)=>{
     const i=exps.length-1-ri;
     const cat=CATS.find(c=>c.id===e.cat)||CATS[6];
+    const photoH=e.img
+      ? `<img class="ethumb" src="${e.img}" onclick="openLightbox('${e.img}')">`
+      : `<div class="eico">${cat.e}</div>`;
     return`<div class="ei">
-      <div class="eico">${cat.e}</div>
+      ${photoH}
       <div class="einf">
         <div class="emch">${e.mch}</div>
         <div class="ecat">${cat.e} ${cat.l} · ${e.dt}</div>
         ${e.no?`<div class="enot">📝 ${e.no}</div>`:''}
+        ${e.img?'':`<button class="ephotobtn" onclick="triggerAttach(${i})">📷 上傳照片/收據</button>`}
       </div>
       <div class="ert">
         <div class="eamt">$${e.amt.toFixed(2)}</div>
@@ -849,6 +987,7 @@ function openExpMd(){
   document.getElementById('ocrl').style.display='none';
   document.getElementById('rfile').value='';
   selCat='food'; renderCats();
+  pendingImg=null;
   openMd('exp-modal');
 }
 function renderCats(){
@@ -859,14 +998,56 @@ function saveExp(){
   const amt=parseFloat(document.getElementById('eamt').value);
   const mch=document.getElementById('emch').value.trim();
   if(!amt||!mch){alert('請填寫金額與商家名稱');return;}
-  exps.push({id:Date.now(),amt,mch,cat:selCat,dt:document.getElementById('edate').value,no:document.getElementById('enot').value.trim()});
+  const e={id:Date.now(),amt,mch,cat:selCat,dt:document.getElementById('edate').value,no:document.getElementById('enot').value.trim()};
+  if(pendingImg)e.img=pendingImg;
+  exps.push(e);
   SS('aus_exp',exps); closeMd('exp-modal'); renderExp();
 }
 function delExp(i){if(!confirm(`刪除「${exps[i].mch}」？`))return;exps.splice(i,1);SS('aus_exp',exps);renderExp();}
 
+// ═══════════ PHOTO COMPRESSION ═══════════
+function compressImage(file,maxDim=800,quality=0.62){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>reject(new Error('read failed'));
+    reader.onload=e=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error('decode failed'));
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>h){if(w>maxDim){h=Math.round(h*maxDim/w);w=maxDim;}}
+        else{if(h>maxDim){w=Math.round(w*maxDim/h);h=maxDim;}}
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+let attachIdx=-1;
+function triggerAttach(i){attachIdx=i;document.getElementById('attachFile').click();}
+async function handleAttachPhoto(ev){
+  const f=ev.target.files[0]; if(!f||attachIdx<0)return;
+  try{
+    const b64=await compressImage(f);
+    exps[attachIdx].img=b64;
+    SS('aus_exp',exps);
+    renderExp();
+  }catch(err){alert('照片處理失敗，請重試');}
+  ev.target.value=''; attachIdx=-1;
+}
+function openLightbox(src){
+  document.getElementById('lboximg').src=src;
+  document.getElementById('lbox').classList.add('on');
+}
+
 // ═══════════ OCR ═══════════
 async function handleOCR(ev){
   const f=ev.target.files[0]; if(!f)return;
+  compressImage(f).then(b64=>{pendingImg=b64;}).catch(()=>{pendingImg=null;});
   const reader=new FileReader();
   reader.onload=async(e)=>{
     const url=e.target.result;
